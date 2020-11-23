@@ -1,0 +1,14 @@
+BasedOnStyle: Google
+SortIncludes: false
+ColumnLimit: 160
+NamespaceIndentation: All
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+BreakConstructorInitializers: AfterColon
+BreakInheritanceList: AfterColon
+AlwaysBreakTemplateDeclarations: Yes
+BinPackArguments: false
+BinPackParameters: false
+SpaceAfterTemplateKeyword: true
+Cpp11BracedListStyle: false
