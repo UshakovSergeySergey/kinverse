@@ -5,11 +5,14 @@
 
 #pragma warning(push)
 
-#define _USE_MATH_DEFINES
-#include <cmath>
-
+#include <memory>
 #include <vector>
+#include <filesystem>
 
 #include <Eigen/Geometry>
+
+#include <vtkPLYReader.h>
+#include <vtkOBJReader.h>
+#include <vtkSTLReader.h>
 
 #pragma warning(pop)

@@ -63,6 +63,12 @@
     <ClInclude Include="..\..\source\visualization\robot_gizmo.h">
       <Filter>Header Files\gizmos</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\visualization\mesh_gizmo.h">
+      <Filter>Header Files\gizmos</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\visualization\mesh_to_vtk_poly_data_converter.h">
+      <Filter>internal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\visualization\stdafx.cpp">
@@ -94,6 +100,12 @@
     </ClCompile>
     <ClCompile Include="..\..\source\visualization\robot_gizmo.cpp">
       <Filter>Source Files\gizmos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\visualization\mesh_gizmo.cpp">
+      <Filter>Source Files\gizmos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\visualization\mesh_to_vtk_poly_data_converter.cpp">
+      <Filter>internal</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

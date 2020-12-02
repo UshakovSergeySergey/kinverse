@@ -8,4 +8,6 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
+#include <unsupported/Eigen/EulerAngles>
+
 #pragma warning(pop)

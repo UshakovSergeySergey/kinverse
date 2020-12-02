@@ -24,7 +24,7 @@ namespace kinverse {
       void setJointIndex(unsigned int jointIndex);
       unsigned int getJointIndex() const;
 
-      void draw(void* renderer) override;
+      void show(void* renderer) override;
 
      private:
       Eigen::Affine3d m_transform{ Eigen::Affine3d::Identity() };

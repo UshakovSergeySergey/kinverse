@@ -4,6 +4,7 @@
 #include "joint_type.h"
 #include "denavit_hartenberg_parameters.h"
 #include "joint_constraints.h"
+#include "mesh.h"
 
 namespace kinverse {
   namespace core {
@@ -22,16 +23,23 @@ namespace kinverse {
       void setConfiguration(const std::vector<double>& configuration);
       std::vector<double> getConfiguration() const;
 
-      void addJoint(const Eigen::Vector3d& jointAxis, const Eigen::Vector3d& displacementVector, JointType jointType);
+      void setBaseTransform(const Eigen::Affine3d& transform);
+      Eigen::Affine3d getBaseTransform() const;
 
       unsigned int getNumberOfJoints() const;
       unsigned int getNumberOfLinks() const;
 
-      std::vector<Eigen::Affine3d> getJointCoordinateFrames(const std::vector<double>& axisValues = {}) const;
-      std::vector<Eigen::Affine3d> getLinkCoordinateFrames(const std::vector<double>& axisValues = {}) const;
+      std::vector<Eigen::Affine3d> getJointCoordinateFrames() const;
+      std::vector<Eigen::Affine3d> getLinkCoordinateFrames() const;
+
+      Eigen::MatrixXd computeJacobian() const;
+      Eigen::MatrixXd computePositionJacobian() const;
+      Eigen::MatrixXd computeInverseJacobian(const Eigen::MatrixXd& jacobian) const;
 
      private:
       std::vector<double> getAxisValues(const std::vector<double>& axisValues) const;
+
+      Eigen::Affine3d m_baseTransform{ Eigen::Affine3d::Identity() };
 
       std::vector<DenavitHartenbergParameters> m_dhTable{};
       std::vector<JointConstraints> m_constraints{};

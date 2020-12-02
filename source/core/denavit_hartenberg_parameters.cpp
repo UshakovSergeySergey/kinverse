@@ -5,13 +5,6 @@ kinverse::core::DenavitHartenbergParameters::DenavitHartenbergParameters(JointTy
     m_jointType{ jointType }, m_alpha{ alpha }, m_d{ d }, m_r{ r }, m_theta{ theta } {
 }
 
-kinverse::core::DenavitHartenbergParameters::DenavitHartenbergParameters(JointType jointType,
-                                                                         const Eigen::Vector3d& position,
-                                                                         const Eigen::Vector3d& direction) :
-    m_jointType{ jointType } {
-  throw std::exception("Not implemented yet!");
-}
-
 void kinverse::core::DenavitHartenbergParameters::setJointType(JointType jointType) {
   m_jointType = jointType;
 }

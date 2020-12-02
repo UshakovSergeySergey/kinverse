@@ -11,10 +11,10 @@ kinverse::visualization::RevoluteJointGizmo::RevoluteJointGizmo(const IGizmo* pa
   setJointIndex(jointIndex);
 }
 
-void kinverse::visualization::RevoluteJointGizmo::draw(void* renderer) {
-  IGizmo::draw(renderer);
-  m_coordinateFrame->draw(renderer);
-  m_cylinder->draw(renderer);
+void kinverse::visualization::RevoluteJointGizmo::show(void* renderer) {
+  IGizmo::show(renderer);
+  m_coordinateFrame->show(renderer);
+  m_cylinder->show(renderer);
 }
 
 void kinverse::visualization::RevoluteJointGizmo::setTransform(const Eigen::Affine3d& transform) {
@@ -33,6 +33,7 @@ void kinverse::visualization::RevoluteJointGizmo::setJointIndex(unsigned int joi
   const auto index = std::to_string(m_jointIndex);
 
   m_coordinateFrame->setCaption("frame" + index);
+  m_coordinateFrame->setCaption("");
 
   std::array<std::string, 3> axisLabels{ "X" + index, "Y" + index, "Z" + index };
   m_coordinateFrame->setAxesLabels(axisLabels);

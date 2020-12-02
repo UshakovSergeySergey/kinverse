@@ -25,19 +25,6 @@ namespace kinverse {
       DenavitHartenbergParameters(JointType jointType, double d, double theta, double r, double alpha);
 
       /**
-       * @brief This constructor is provided in order to simplify the computation of DH parameters.
-       * If you don't know how to compute these parameters, or don't want to bother yourself with geometry, use this helper constructor.
-       * Joint axis (axis of rotation in case of revolute joint, or direction of linear motion in case of prismatic joint) is simply an infinite line in 3d.
-       * Line in 3d can be described with (point, direction) pair. This constructor takes this pair and converts it into valid Denavit-Hartenberg parameters.
-       * Note that direction matters: 'direction' and '-direction' describe different joints. E.g. for revolute joint rotation axis would be the same, but
-       * positive direction of rotation will differ.
-       * @param[in] jointType - type of joint (revolute or prismatic)
-       * @param[in] position - you can pass any point that belong to the joint's axis.
-       * @param[in] direction - direction in which joint's axis is pointing
-       */
-      DenavitHartenbergParameters(JointType jointType, const Eigen::Vector3d& position, const Eigen::Vector3d& direction);
-
-      /**
        * @brief This method sets the joint type described with these DH parameters
        * @param[in] jointType - joint type (revolute or prismatic)
        */

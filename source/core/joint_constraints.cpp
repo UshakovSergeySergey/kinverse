@@ -36,5 +36,5 @@ bool kinverse::core::JointConstraints::violatesRangeConstraint(double axisValue)
 }
 
 double kinverse::core::JointConstraints::clampAxisValue(double axisValue) const {
-  return math::clamp(axisValue, m_minimumAxisValue, m_maximumAxisValue);
+  return std::clamp(axisValue, m_minimumAxisValue, m_maximumAxisValue);
 }

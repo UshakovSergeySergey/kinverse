@@ -58,10 +58,11 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>EXPORT_KINVERSE_VISUALIZATION;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SILENCE_CXX17_NEGATORS_DEPRECATION_WARNING;EXPORT_KINVERSE_VISUALIZATION;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <AdditionalIncludeDirectories>D:\Git\cvs-dependencies\x64\eigen-3.3.4;D:\Git\cvs-dependencies\x64\vtk-8.1.0\include\vtk-8.1;$(SolutionDir)/../../source/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -76,10 +77,11 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>EXPORT_KINVERSE_VISUALIZATION;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SILENCE_CXX17_NEGATORS_DEPRECATION_WARNING;EXPORT_KINVERSE_VISUALIZATION;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <AdditionalIncludeDirectories>D:\Git\cvs-dependencies\x64\eigen-3.3.4;D:\Git\cvs-dependencies\x64\vtk-8.1.0\include\vtk-8.1;$(SolutionDir)/../../source/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -99,6 +101,8 @@
     <ClInclude Include="..\..\source\visualization\i_gizmo_impl.h" />
     <ClInclude Include="..\..\source\visualization\kinverse_visualizer.h" />
     <ClInclude Include="..\..\source\visualization\kinverse_visualizer_impl.h" />
+    <ClInclude Include="..\..\source\visualization\mesh_gizmo.h" />
+    <ClInclude Include="..\..\source\visualization\mesh_to_vtk_poly_data_converter.h" />
     <ClInclude Include="..\..\source\visualization\revolute_joint_gizmo.h" />
     <ClInclude Include="..\..\source\visualization\robot_gizmo.h" />
     <ClInclude Include="..\..\source\visualization\stdafx.h" />
@@ -111,6 +115,8 @@
     <ClCompile Include="..\..\source\visualization\cylinder_gizmo.cpp" />
     <ClCompile Include="..\..\source\visualization\i_gizmo.cpp" />
     <ClCompile Include="..\..\source\visualization\kinverse_visualizer.cpp" />
+    <ClCompile Include="..\..\source\visualization\mesh_gizmo.cpp" />
+    <ClCompile Include="..\..\source\visualization\mesh_to_vtk_poly_data_converter.cpp" />
     <ClCompile Include="..\..\source\visualization\revolute_joint_gizmo.cpp" />
     <ClCompile Include="..\..\source\visualization\robot_gizmo.cpp" />
     <ClCompile Include="..\..\source\visualization\stdafx.cpp">

@@ -60,30 +60,36 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SILENCE_CXX17_NEGATORS_DEPRECATION_WARNING;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)/../../../cvs-dependencies/$(Platform)/eigen-3.3.4/;$(SolutionDir)/../../source/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Git\cvs-dependencies\x64\vtk-8.1.0\include\vtk-8.1;$(SolutionDir)/../../../cvs-dependencies/$(Platform)/eigen-3.3.4/;$(SolutionDir)/../../source/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>D:\Git\cvs-dependencies\x64\vtk-8.1.0\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vtkCommonCore-8.1.lib;vtkCommonColor-8.1.lib;vtkCommonComputationalGeometry-8.1.lib;vtkCommonDataModel-8.1.lib;vtkCommonExecutionModel-8.1.lib;vtkCommonMath-8.1.lib;vtkCommonTransforms-8.1.lib;vtkFiltersCore-8.1.lib;vtkFiltersGeneral-8.1.lib;vtkFiltersHybrid-8.1.lib;vtkFiltersSources-8.1.lib;vtkIOGeometry-8.1.lib;vtkInteractionStyle-8.1.lib;vtkRenderingAnnotation-8.1.lib;vtkRenderingCore-8.1.lib;vtkRenderingFreeType-8.1.lib;vtkRenderingLOD-8.1.lib;vtkRenderingOpenGL2-8.1.lib;vtkIOPLY-8.1.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SILENCE_CXX17_NEGATORS_DEPRECATION_WARNING;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)/../../../cvs-dependencies/$(Platform)/eigen-3.3.4/;$(SolutionDir)/../../source/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Git\cvs-dependencies\x64\vtk-8.1.0\include\vtk-8.1;$(SolutionDir)/../../../cvs-dependencies/$(Platform)/eigen-3.3.4/;$(SolutionDir)/../../source/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>D:\Git\cvs-dependencies\x64\vtk-8.1.0\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vtkCommonCore-8.1-gd.lib;vtkCommonColor-8.1-gd.lib;vtkCommonComputationalGeometry-8.1-gd.lib;vtkCommonDataModel-8.1-gd.lib;vtkCommonExecutionModel-8.1-gd.lib;vtkCommonMath-8.1-gd.lib;vtkCommonTransforms-8.1-gd.lib;vtkFiltersCore-8.1-gd.lib;vtkFiltersGeneral-8.1-gd.lib;vtkFiltersHybrid-8.1-gd.lib;vtkFiltersSources-8.1-gd.lib;vtkIOGeometry-8.1-gd.lib;vtkInteractionStyle-8.1-gd.lib;vtkRenderingAnnotation-8.1-gd.lib;vtkRenderingCore-8.1-gd.lib;vtkRenderingFreeType-8.1-gd.lib;vtkRenderingLOD-8.1-gd.lib;vtkRenderingOpenGL2-8.1-gd.lib;vtkIOPLY-8.1-gd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -99,6 +105,12 @@
   <ItemGroup>
     <ProjectReference Include="core.vcxproj">
       <Project>{e24675be-bde0-4457-90b6-1b26d9eacc0e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="io.vcxproj">
+      <Project>{ab876d62-6e9c-44fa-9d86-78ce02fb0ebf}</Project>
+    </ProjectReference>
+    <ProjectReference Include="math.vcxproj">
+      <Project>{a73fa341-250c-43d5-8203-e9a649841f5d}</Project>
     </ProjectReference>
     <ProjectReference Include="visualization.vcxproj">
       <Project>{77db57f9-366d-4709-8b91-7a251e50763e}</Project>

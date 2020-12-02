@@ -27,12 +27,7 @@ void kinverse::core::Robot::setConfiguration(const std::vector<double>& configur
 }
 
 std::vector<double> kinverse::core::Robot::getConfiguration() const {
-  return m_configuration;
-}
-
-void kinverse::core::Robot::addJoint(const Eigen::Vector3d& axis, const Eigen::Vector3d& point, JointType jointType) {
-  const auto dhParameters = DenavitHartenbergParameters(jointType, axis, point);
-  m_dhTable.push_back(dhParameters);
+  return getAxisValues(m_configuration);
 }
 
 unsigned int kinverse::core::Robot::getNumberOfJoints() const {
@@ -43,13 +38,12 @@ unsigned int kinverse::core::Robot::getNumberOfLinks() const {
   return getNumberOfJoints() + 1;
 }
 
-std::vector<Eigen::Affine3d> kinverse::core::Robot::getJointCoordinateFrames(const std::vector<double>& axisValues_) const {
-  //  const auto axisValues = getAxisValues(axisValues_);
+std::vector<Eigen::Affine3d> kinverse::core::Robot::getJointCoordinateFrames() const {
   const auto axisValues = getAxisValues(m_configuration);
 
   std::vector<Eigen::Affine3d> frames{};
 
-  Eigen::Affine3d transform = Eigen::Affine3d::Identity();
+  Eigen::Affine3d transform = m_baseTransform;
   for (auto jointCounter = 0u; jointCounter < getNumberOfJoints(); jointCounter++) {
     const auto& dhParameters = m_dhTable[jointCounter];
     const double axisValue = axisValues[jointCounter];
@@ -69,16 +63,16 @@ std::vector<Eigen::Affine3d> kinverse::core::Robot::getJointCoordinateFrames(con
   return frames;
 }
 
-std::vector<Eigen::Affine3d> kinverse::core::Robot::getLinkCoordinateFrames(const std::vector<double>& axisValues_) const {
+std::vector<Eigen::Affine3d> kinverse::core::Robot::getLinkCoordinateFrames() const {
   // Number of links is always equal to number of joints + 1
   // The first link (also known as base frame or inertial frame) is always the origin.
   // The last link is the end-effector.
 
-  const auto axisValues = getAxisValues(axisValues_);
+  const auto axisValues = getAxisValues(m_configuration);
 
   std::vector<Eigen::Affine3d> frames{};
 
-  Eigen::Affine3d transform = Eigen::Affine3d::Identity();
+  Eigen::Affine3d transform = m_baseTransform;
 
   frames.push_back(transform);
 
@@ -132,3 +126,103 @@ std::vector<Eigen::Affine3d> kinverse::core::Robot::getFrames() const {
 
       std::vector<Eigen::Affine3d> getFrames() const;
 */
+
+/*
+number of rows in jacobian matrix       = 6 (xyzabc)
+number of columns in jacobian matrix    = number of joints
+
+
+
+
+linear
+rotational
+*/
+
+Eigen::MatrixXd kinverse::core::Robot::computePositionJacobian() const {
+  // Jacobian matrix defines the relationship between joint velocities and end-effector velocities.
+  const unsigned int numberOfRows = 3;
+  const unsigned int numberOfColumns = getNumberOfJoints();
+
+  Eigen::MatrixXd jacobian(numberOfRows, numberOfColumns);
+  jacobian.setZero();
+
+  const auto linkFrames = getLinkCoordinateFrames();
+  const Eigen::Vector3d endEffectorPosition = linkFrames.back().translation();
+  for (auto jointCounter = 0u; jointCounter < getNumberOfJoints(); ++jointCounter) {
+    const Eigen::Vector3d jointAxis = linkFrames[jointCounter].rotation().col(2);
+
+    Eigen::Vector3d linear;
+
+    if (m_dhTable[jointCounter].getJointType() == JointType::Prismatic) {
+      linear = jointAxis;
+    } else {
+      const Eigen::Vector3d jointPosition = linkFrames[jointCounter].translation();
+
+      linear = jointAxis.cross(endEffectorPosition - jointPosition);
+    }
+
+    jacobian.col(jointCounter) << linear;
+  }
+
+  return jacobian;
+}
+
+Eigen::MatrixXd kinverse::core::Robot::computeJacobian() const {
+  // Jacobian matrix defines the relationship between joint velocities and end-effector velocities.
+  const unsigned int numberOfRows = 6;
+  const unsigned int numberOfColumns = getNumberOfJoints();
+
+  Eigen::MatrixXd jacobian(numberOfRows, numberOfColumns);
+  jacobian.setZero();
+
+  const auto linkFrames = getLinkCoordinateFrames();
+  const Eigen::Vector3d endEffectorPosition = linkFrames.back().translation();
+  for (auto jointCounter = 0u; jointCounter < getNumberOfJoints(); ++jointCounter) {
+    const Eigen::Vector3d jointAxis = linkFrames[jointCounter].rotation().col(2);
+
+    Eigen::Vector3d linear;
+    Eigen::Vector3d rotational;
+
+    if (m_dhTable[jointCounter].getJointType() == JointType::Prismatic) {
+      linear = jointAxis;
+      rotational = { 0.0, 0.0, 0.0 };
+    } else {
+      const Eigen::Vector3d jointPosition = linkFrames[jointCounter].translation();
+
+      linear = jointAxis.cross(endEffectorPosition - jointPosition);
+      rotational = jointAxis;
+    }
+
+    jacobian.col(jointCounter) << linear, rotational;
+  }
+
+  return jacobian;
+
+  /*
+   * compute the Jacobian
+   * compute pseudoinverse of the Jacobian
+   * deltaAxes = pseudoInverseJacobian * deltaEndEffector
+   * axes = axes + alpha * deltaAxes
+   */
+}
+
+Eigen::MatrixXd kinverse::core::Robot::computeInverseJacobian(const Eigen::MatrixXd& jacobian) const {
+  if (jacobian.cols() == jacobian.rows())
+    return jacobian.inverse();
+
+  return jacobian.transpose();
+  return (jacobian.transpose() * jacobian).inverse() * jacobian.transpose();
+
+  //  return jacobian.transpose();
+
+  // matrix is not square, compute pseudoinverse jacobian
+  //  return (jacobian.transpose() * jacobian).inverse() * jacobian.transpose();
+}
+
+void kinverse::core::Robot::setBaseTransform(const Eigen::Affine3d& transform) {
+  m_baseTransform = transform;
+}
+
+Eigen::Affine3d kinverse::core::Robot::getBaseTransform() const {
+  return m_baseTransform;
+}

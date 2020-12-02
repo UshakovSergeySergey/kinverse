@@ -84,8 +84,8 @@ bool kinverse::visualization::Text3DGizmo::getViewportConstScale() const {
   return m_viewportConstScale;
 }
 
-void kinverse::visualization::Text3DGizmo::draw(void* renderer) {
-  IGizmo::draw(renderer);
+void kinverse::visualization::Text3DGizmo::show(void* renderer) {
+  IGizmo::show(renderer);
   updateSubscriptionForCameraEvents();
 }
 

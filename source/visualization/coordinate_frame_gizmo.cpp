@@ -81,7 +81,7 @@ void kinverse::visualization::CoordinateFrameGizmo::scaleLabels(double scale) {
   }
 }
 
-void kinverse::visualization::CoordinateFrameGizmo::draw(void* renderer) {
-  IGizmo::draw(renderer);
-  m_captionGizmo->draw(renderer);
+void kinverse::visualization::CoordinateFrameGizmo::show(void* renderer) {
+  IGizmo::show(renderer);
+  m_captionGizmo->show(renderer);
 }

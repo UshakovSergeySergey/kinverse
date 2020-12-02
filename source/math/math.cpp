@@ -11,10 +11,15 @@ double kinverse::math::radiansToDegrees(double angleInRadians) {
   return angleInRadians * toDegrees;
 }
 
-double kinverse::math::clamp(double value, double min, double max) {
-  if (value < min)
-    return min;
-  if (value > max)
-    return max;
-  return value;
+void kinverse::math::toXYZABC(const Eigen::Affine3d& transform, Eigen::Vector3d& xyz, Eigen::Vector3d& abc) {
+  xyz = transform.translation();
+  abc = Eigen::EulerAnglesZYXd(transform.rotation()).angles();
+}
+
+Eigen::Affine3d kinverse::math::fromXYZABC(const Eigen::Vector3d& xyz, const Eigen::Vector3d& abc) {
+  return Eigen::Translation3d(xyz) * Eigen::EulerAnglesZYXd(abc.x(), abc.y(), abc.z());
+}
+
+bool kinverse::math::pointLiesOnLine(const Eigen::Vector3d& origin, const Eigen::Vector3d& direction, const Eigen::Vector3d& point) {
+  throw std::exception("Not implemented yet!");
 }

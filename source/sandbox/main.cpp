@@ -3,43 +3,141 @@
 #include <visualization/coordinate_frame_gizmo.h>
 #include <visualization/revolute_joint_gizmo.h>
 #include <core/robot.h>
+#include <core/robot_factory.h>
+#include <core/analytical_solver.h>
+#include <visualization/mesh_gizmo.h>
 
 #include <iostream>
 
+#include <vtkPLYReader.h>
+#include <vtkOBJReader.h>
+#include <vtkSTLReader.h>
+#include <visualization/robot_gizmo.h>
+#include <math/math.h>
+#include <unsupported/Eigen/EulerAngles>
+#include <io/mesh_reader.h>
+
+void printConfiguration(const std::vector<double>& configuration) {
+  std::cout << std::fixed << std::showpoint << std::setprecision(5);
+  std::cout << "(A1, A2, A3, A4, A5, A6) = ("                              //
+            << kinverse::math::radiansToDegrees(configuration[0]) << ", "  //
+            << kinverse::math::radiansToDegrees(configuration[1]) << ", "  //
+            << kinverse::math::radiansToDegrees(configuration[2]) << ", "  //
+            << kinverse::math::radiansToDegrees(configuration[3]) << ", "  //
+            << kinverse::math::radiansToDegrees(configuration[4]) << ", "  //
+            << kinverse::math::radiansToDegrees(configuration[5]) << ")" << std::endl;
+}
+
+void printEndEffector(const Eigen::Vector3d& xyz, const Eigen::Vector3d& abc) {
+  std::cout << std::fixed << std::showpoint << std::setprecision(5);
+  std::cout << "(X, Y, Z, A, B, C) = ("                           //
+            << xyz.x() << ", "                                    //
+            << xyz.y() << ", "                                    //
+            << xyz.z() << ", "                                    //
+            << kinverse::math::radiansToDegrees(abc.x()) << ", "  //
+            << kinverse::math::radiansToDegrees(abc.y()) << ", "  //
+            << kinverse::math::radiansToDegrees(abc.z()) << ")" << std::endl;
+}
+
 int main(int argc, char** argv) {
-  // create empty robot
-  auto robot = std::make_shared<kinverse::core::Robot>();
-  // Robot
-  // RobotConfiguration
-  // RobotGizmo
-
-  // configure robot joints
-  std::vector<kinverse::core::DenavitHartenbergParameters> dhTable{
-    { kinverse::core::JointType::Revolute, 0.0, 0.0, 0.0, M_PI },          //
-    { kinverse::core::JointType::Revolute, -400.0, 0.0, 180.0, M_PI_2 },   //
-    { kinverse::core::JointType::Revolute, 0.0, 0.0, 600.0, 0.0 },         //
-    { kinverse::core::JointType::Revolute, 0.0, -M_PI_2, 120.0, M_PI_2 },  //
-    { kinverse::core::JointType::Revolute, -620.0, 0.0, 0.0, -M_PI_2 },    //
-    { kinverse::core::JointType::Revolute, 0.0, 0.0, 0.0, M_PI_2 }         //
-  };
-  robot->setDHTable(dhTable);
-
-  // create visualizer with world frame
-  const auto worldFrameGizmo = std::make_shared<kinverse::visualization::CoordinateFrameGizmo>(nullptr, Eigen::Affine3d::Identity(), "world");
-  worldFrameGizmo->setScale(0.25);
-  auto visualizer = std::make_shared<kinverse::visualization::KinverseVisualizer>();
-  visualizer->addGizmo(worldFrameGizmo);
-
-  // draw robot joints
-  const auto joints = robot->getJointCoordinateFrames();
-  const auto numberOfJoints = joints.size();
-  for (auto jointCounter = 0u; jointCounter < numberOfJoints; ++jointCounter) {
-    auto revoluteJointGizmo = std::make_shared<kinverse::visualization::RevoluteJointGizmo>(nullptr, joints[jointCounter], jointCounter);
-    visualizer->addGizmo(revoluteJointGizmo);
+  std::vector<kinverse::core::Mesh::ConstPtr> meshes{};
+  {
+    const std::vector<std::string> axisMeshFilenames{
+      "D:/Git/kinverse/meshes/kuka-kr5-arc/link-1.ply",  //
+      "D:/Git/kinverse/meshes/kuka-kr5-arc/link-2.ply",  //
+      "D:/Git/kinverse/meshes/kuka-kr5-arc/link-3.ply",  //
+      "D:/Git/kinverse/meshes/kuka-kr5-arc/link-4.ply",  //
+      "D:/Git/kinverse/meshes/kuka-kr5-arc/link-5.ply",  //
+      "D:/Git/kinverse/meshes/kuka-kr5-arc/link-6.ply"   //
+    };
+    for (auto filename : axisMeshFilenames) {
+      meshes.push_back(kinverse::io::MeshReader().read(filename));
+    }
   }
 
-  int ggg;
-  std::cin >> ggg;
+  // бага, если поставить робота в конфигурацию (0, 0, 0, 0, 0, 0) и взять координаты endeffector как таргет для ik, решение будет странным, почему он
+  // складывается в гармошку?
+
+  // create robot
+  auto robot = kinverse::core::RobotFactory::create(kinverse::core::RobotType::KukaKR5Arc);
+
+  // set robot initial configuration
+  const std::vector<double> robotConfiguration{ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+  //{ kinverse::math::degreesToRadians(22.854), kinverse::math::degreesToRadians(-80.0),
+  //                                              kinverse::math::degreesToRadians(80.0),   kinverse::math::degreesToRadians(0.073),
+  //                                              kinverse::math::degreesToRadians(22.879), kinverse::math::degreesToRadians(119.070) };
+  robot->setConfiguration(robotConfiguration);
+
+  // set target for IK
+  const Eigen::Affine3d targetTransform = robot->getLinkCoordinateFrames().back();
+  Eigen::Vector3d targetXYZ;
+  Eigen::Vector3d targetABC;
+  kinverse::math::toXYZABC(targetTransform, targetXYZ, targetABC);
+
+  // const Eigen::Vector3d targetXYZ{ 400.0, -300.0, 300.0 };
+  // const Eigen::Vector3d targetXYZ{ 400.0, 300.0, 300.0 };
+  // const Eigen::Vector3d targetXYZ{ 600.0, -300.0, 300.0 };
+  // const Eigen::Vector3d targetXYZ{ 600.0, 300.0, 300.0 };
+  // const Eigen::Vector3d targetABC{ 0.0, 0.0, M_PI };
+  // const Eigen::Affine3d targetTransform = kinverse::math::fromXYZABC(targetXYZ, targetABC);
+
+  // create visualizer
+  auto kinverseVisualizer = std::make_shared<kinverse::visualization::KinverseVisualizer>();
+
+  auto robotGizmo = std::make_shared<kinverse::visualization::RobotGizmo>(nullptr, robot);
+  robotGizmo->setConfiguration(robotConfiguration);
+  robotGizmo->setMeshes(meshes);
+  kinverseVisualizer->addGizmo(robotGizmo);
+
+  auto worldGizmo = std::make_shared<kinverse::visualization::CoordinateFrameGizmo>(nullptr);
+  worldGizmo->setCaption("world");
+  kinverseVisualizer->addGizmo(worldGizmo);
+
+  auto targetGizmo = std::make_shared<kinverse::visualization::CoordinateFrameGizmo>(nullptr, targetTransform);
+  targetGizmo->setCaption("target");
+  kinverseVisualizer->addGizmo(targetGizmo);
+
+  // create solver
+  auto ikSolver = std::make_shared<kinverse::core::AnalyticalSolver>(robot);
+
+  // solve IK
+  const auto configuration = ikSolver->solveUnrefactored(targetTransform);
+
+  // set robot configuration
+  robot->setConfiguration(configuration);
+  robotGizmo->setConfiguration(configuration);
+
+  // print info
+  const Eigen::Affine3d solvedTransform = robot->getLinkCoordinateFrames().back();
+  Eigen::Vector3d solvedXYZ;
+  Eigen::Vector3d solvedABC;
+  kinverse::math::toXYZABC(solvedTransform, solvedXYZ, solvedABC);
+
+  std::cout << std::endl;
+  std::cout << "Initial configuration:" << std::endl;
+  printConfiguration(robotConfiguration);
+  printEndEffector(targetXYZ, targetABC);
+  std::cout << std::endl;
+
+  std::cout << "Solved configuration:" << std::endl;
+  printConfiguration(configuration);
+  printEndEffector(solvedXYZ, solvedABC);
+
+  return 0;
+
+  bool flag = false;
+  while (std::cin.get()) {
+    flag = !flag;
+    std::cout << "flag = " << flag << std::endl;
+
+    if (flag) {
+      robot->setConfiguration(configuration);
+      robotGizmo->setConfiguration(configuration);
+    } else {
+      robot->setConfiguration(robotConfiguration);
+      //      robotGizmo->setConfiguration(robotConfiguration);
+    }
+  }
 
   return 0;
 }
@@ -60,23 +158,91 @@ int main(int argc, char** argv) {
 11) class FrameConnectionGizmo {};
 12) class PrismaticJointGizmo {};
 13) class EndEffectorGizmo {};
+*/
 
-int main(int argc, char** argv) {
-        //create empty robot
-        auto robot = std::make_shared<kinverse::Robot>();
+/*
+const Eigen::Affine3d targetTransform = convertWorldToLocal(endEffectorTransform);
+  const Eigen::Vector3d wristPosition = computeWristPosition(targetTransform);
+  const Eigen::Vector3d firstJointZAxis = getFirstJointZAxis();
+  if (math::pointLiesOnLine(Eigen::Vector3d::Zero(), firstJointZAxis, wristPosition)) {
+    // if wristPosition lies on z0 axis then we have a singularity, in this case theta1 has infinite number of solutions
+    throw std::domain_error("We have a singularity! Wrist position lies on z0 axis! theta1 has infinite number of solutions!");
+  }
 
-        //lets configure it
-        robot->addJoint(-Eigen::Vector3d::UnitZ(), Eigen::Vector3d{ 0.0, 0.0, 0.0 }, kinverse::JointType::Revolute, "A1");
-        robot->addJoint(Eigen::Vector3d::UnitY(), Eigen::Vector3d{ 180.0, 0.0, 400.0 }, kinverse::JointType::Revolute, "A2");
-        robot->addJoint(Eigen::Vector3d::UnitY(), Eigen::Vector3d{ 780.0, 0.0, 400.0 }, kinverse::JointType::Revolute, "A3");
-        robot->addJoint(-Eigen::Vector3d::UnitX(), Eigen::Vector3d{ 780.0, 0.0, 520.0 }, kinverse::JointType::Revolute, "A4");
-        robot->addJoint(Eigen::Vector3d::UnitY(), Eigen::Vector3d{ 1400.0, 0.0, 520.0 }, kinverse::JointType::Revolute, "A5");
-        robot->addJoint(-Eigen::Vector3d::UnitX(), Eigen::Vector3d{ 1400.0, 0.0, 520.0 }, kinverse::JointType::Revolute, "A6");
+  const auto forwardFacingSolutions = solveForForwardFacing(theta1);
+  const auto backwardFacingSolutions = solveForBackwardFacing(theta1 + M_PI);
 
-        //robot->getDenaviteHartenbergParameters();
-        //	robot->setEndEffectorDisplacement();
-        //	robot->addJoint(Eigen::Vector3d::Zero(), Eigen::Vector3d{ 1515.0, 0.0, 520.0 }, kinverse::JointType::EndEffector);
-        //	robot->addJoint(kinverse::JointType::Revolute);
-        return 0;
-}
+  // NOTE 2: here we do not consider another possible solution [atan2(y, x) + M_PI]
+  const double theta1 = std::atan2(wristPosition.y(), wristPosition.x());
+
+  // now when we know theta1 we can compute position of the second joint
+  const Eigen::Vector3d secondJointPosition = m_robot->getDHTable()[0].getTransform(theta1).translation();
+
+  // project wristPosition and secondJointPosition on Oxy plane
+  const Eigen::Vector2d wristPositionProjection{ wristPosition.x(), wristPosition.y() };
+  const Eigen::Vector2d secondJointPositionProjection{ secondJointPosition.x(), secondJointPosition.y() };
+
+  const double a = (wristPosition - secondJointPosition).norm();
+  const double b = std::abs(wristPosition.z() - secondJointPosition.z());
+  const double c = (wristPositionProjection - secondJointPositionProjection).norm();
+
+  const double distanceFromSecondToThirdJoint = m_robot->getDHTable()[1].getTransform().translation().norm();
+  const double distanceFromThirdJointToWristPosition = (m_robot->getDHTable()[2].getTransform() * m_robot->getDHTable()[3].getTransform()).translation().norm();
+
+  // using Pythagorean theorem we get first equation
+  // a * a = b * b + c * c
+
+  // using Law of cosines we get another equation
+  // a * a = distanceFromSecondToThirdJoint * distanceFromSecondToThirdJoint + distanceFromThirdJointToWristPosition * distanceFromThirdJointToWristPosition
+  // - 2.0 * distanceFromSecondToThirdJoint * distanceFromThirdJointToWristPosition * cosKsi
+
+  // cosKsi = cos(M_PI - gamma - theta3)
+  // gamma is the angle between z4 axis and direction from third joint to wrist position
+  const double gamma = computeGamma();
+
+  // a * a = distanceFromSecondToThirdJoint * distanceFromSecondToThirdJoint + distanceFromThirdJointToWristPosition * distanceFromThirdJointToWristPosition
+  // + 2.0 * distanceFromSecondToThirdJoint * distanceFromThirdJointToWristPosition * cos(gamma + theta3)
+
+  // using Pythagorean trigonometric identity
+  // sin * sin + cos * cos = 1
+
+  // cosine = cos(gamma + theta3)
+  // sine = sin(gamma + theta3)
+
+  const double cosine = (b * b + c * c - distanceFromSecondToThirdJoint * distanceFromSecondToThirdJoint -
+                         distanceFromThirdJointToWristPosition * distanceFromThirdJointToWristPosition) /
+                        (2.0 * distanceFromSecondToThirdJoint * distanceFromThirdJointToWristPosition);
+  const double sine = std::sqrt(1.0 - cosine * cosine);
+
+  // NOTE 3: here we do not consider another possible solution [atan2(-sine, cosine) + gamma]
+  const double theta3 = atan2(sine, cosine) + gamma;
+
+  // const double tanAlpha = b / c;
+  // const double tanBetta =
+  //    (distanceFromThirdJointToWristPosition * sin(theta3)) / (distanceFromSecondToThirdJoint + distanceFromThirdJointToWristPosition * cos(theta3));
+
+  // const double theta2 = -atan2(b, c) - atan2(distanceFromThirdJointToWristPosition * sin(theta3),
+  //                                           distanceFromSecondToThirdJoint + distanceFromThirdJointToWristPosition * cos(theta3));
+
+  const double cosBetta = (distanceFromSecondToThirdJoint * distanceFromSecondToThirdJoint + a * a -
+                           distanceFromThirdJointToWristPosition * distanceFromThirdJointToWristPosition) /
+                          (2.0 * distanceFromSecondToThirdJoint * a);
+  const double theta2 = -atan2(b, c) - acos(cosBetta);
+
+  const Eigen::Matrix3d endEffectorOrientation = targetTransform.rotation();
+  const Eigen::Matrix3d wristOrientation = computeWristOrientation(theta1, theta2, theta3);  // it is not wrist, it is the fourth joint
+  const Eigen::Matrix3d fromWristToEndEffectorRotation = wristOrientation.transpose() * endEffectorOrientation;
+
+  const double r33 = fromWristToEndEffectorRotation(2, 2);
+  const double r23 = fromWristToEndEffectorRotation(1, 2);
+  const double r13 = fromWristToEndEffectorRotation(0, 2);
+  const double r32 = fromWristToEndEffectorRotation(2, 1);
+  const double r31 = fromWristToEndEffectorRotation(2, 0);
+
+  const double theta5 = M_PI + atan2(-std::sqrt(1.0 - r33 * r33), r33);
+  const double theta4 = atan2(-r23, -r13);
+  const double theta6 = -atan2(-r32, +r31);
+
+  const std::vector<double> configuration{ theta1, theta2, theta3, theta4, theta5, theta6 };
+  return configuration;
 */

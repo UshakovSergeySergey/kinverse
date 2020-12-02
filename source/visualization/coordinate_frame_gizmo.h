@@ -32,7 +32,7 @@ namespace kinverse {
       void setScale(double scale);
       double getScale() const;
 
-      void draw(void* renderer) override;
+      void show(void* renderer) override;
 
      private:
       void updateTransform();

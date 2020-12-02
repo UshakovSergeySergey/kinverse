@@ -38,7 +38,7 @@ namespace kinverse {
       void setViewportConstScale(bool viewportConstScale);
       bool getViewportConstScale() const;
 
-      void draw(void* renderer) override;
+      void show(void* renderer) override;
 
      private:
       void updateSubscriptionForCameraEvents();

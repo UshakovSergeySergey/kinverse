@@ -11,6 +11,9 @@ namespace kinverse {
     class MainWindow : public QMainWindow {
       Q_OBJECT
 
+     signals:
+      void ggg();
+
      public:
       explicit MainWindow(QWidget* parent = Q_NULLPTR);
       virtual ~MainWindow() = default;
@@ -22,6 +25,10 @@ namespace kinverse {
       void updateGizmo();
 
       void updateRobot();
+      void updateEndEffector();
+      void solveIK();
+      void fff();
+      std::thread m_thread;
 
       Ui::MainWindow m_ui;
       visualization::KinverseVisualizer::Ptr m_kinverseVisualizer{ nullptr };

@@ -38,7 +38,7 @@ void kinverse::visualization::KinverseVisualizer::addGizmo(IGizmo::Ptr gizmo) {
     throw std::invalid_argument("m_pImpl->m_renderer is nullptr! It is an internal error, there is nothing you can do about it!");
 
   m_gizmos.push_back(gizmo);
-  gizmo->draw(reinterpret_cast<void*>(&m_pImpl->m_renderer));
+  gizmo->show(reinterpret_cast<void*>(&m_pImpl->m_renderer));
 }
 
 void kinverse::visualization::KinverseVisualizer::processEvents() {
