@@ -58,8 +58,15 @@ namespace kinverse {
       /**
        * @brief This method adds @p IGizmo object to visualizer. You can create any gizmo (MeshGizmo, CoordinateFrameGizmo, etc) and simply add it to @p
        * KinverseVisualizer, visualizer will take care of rendering and updating everything.
+       * @param[in] gizmo - gizmo to add to visualizer and rendering pipeline
        */
       void addGizmo(IGizmo::Ptr gizmo);
+
+      /**
+       * @brief This method removes @p IGizmo object from visualizer. It also removes all objects related to this gizmo from the rendering pipeline.
+       * @param[in] gizmo - gizmo to remove from visualizer and rendering pipeline
+       */
+      void removeGizmo(IGizmo::Ptr gizmo);
 
      private:
       /**

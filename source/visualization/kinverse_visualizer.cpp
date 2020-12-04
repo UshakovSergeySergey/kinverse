@@ -41,6 +41,10 @@ void kinverse::visualization::KinverseVisualizer::addGizmo(IGizmo::Ptr gizmo) {
   gizmo->show(reinterpret_cast<void*>(&m_pImpl->m_renderer));
 }
 
+void kinverse::visualization::KinverseVisualizer::removeGizmo(IGizmo::Ptr gizmo) {
+  throw std::exception("Not implemented yet!");
+}
+
 void kinverse::visualization::KinverseVisualizer::processEvents() {
   if (!m_pImpl->m_renderWindow)
     throw std::invalid_argument("m_pImpl->m_renderWindow is nullptr! It is an internal error, there is nothing you can do about it!");

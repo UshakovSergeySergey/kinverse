@@ -5,7 +5,7 @@
 kinverse::visualization::CubeGizmo::CubeGizmo(
     const IGizmo* parentGizmo, const Eigen::Affine3d& transform, double width, double height, double depth, const Color& color) :
     IGizmo{ parentGizmo } {
-  m_pImpl->m_actor = vtkSmartPointer<vtkActor>::New();
+  m_pImpl->setViewProp(vtkSmartPointer<vtkActor>::New());
   setTransform(transform);
   setColor(color);
   setWidth(width);
@@ -22,9 +22,9 @@ void kinverse::visualization::CubeGizmo::setTransform(const Eigen::Affine3d& tra
   vtkSmartPointer<vtkTransform> cubeTransform = vtkSmartPointer<vtkTransform>::New();
   cubeTransform->SetMatrix(matrix.data());
 
-  vtkActor::SafeDownCast(m_pImpl->m_actor)->SetUserTransform(cubeTransform);
+  vtkActor::SafeDownCast(m_pImpl->getViewProp())->SetUserTransform(cubeTransform);
 
-  update();
+  render();
 }
 
 Eigen::Affine3d kinverse::visualization::CubeGizmo::getTransform() const {
@@ -34,12 +34,12 @@ Eigen::Affine3d kinverse::visualization::CubeGizmo::getTransform() const {
 void kinverse::visualization::CubeGizmo::setColor(const Color& color) {
   m_color = color;
 
-  auto actor = vtkActor::SafeDownCast(m_pImpl->m_actor);
+  auto actor = vtkActor::SafeDownCast(m_pImpl->getViewProp());
 
   actor->GetProperty()->SetColor(std::get<0>(m_color) / 255.0, std::get<1>(m_color) / 255.0, std::get<2>(m_color) / 255.0);
   actor->GetProperty()->SetOpacity(std::get<3>(m_color) / 255.0);
 
-  update();
+  render();
 }
 
 kinverse::visualization::Color kinverse::visualization::CubeGizmo::getColor() const {
@@ -82,7 +82,7 @@ void kinverse::visualization::CubeGizmo::updateGeometry() {
   vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   mapper->SetInputConnection(cubeSource->GetOutputPort());
 
-  vtkActor::SafeDownCast(m_pImpl->m_actor)->SetMapper(mapper);
+  vtkActor::SafeDownCast(m_pImpl->getViewProp())->SetMapper(mapper);
 
-  update();
+  render();
 }

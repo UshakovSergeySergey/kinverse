@@ -5,7 +5,7 @@
 kinverse::visualization::CoordinateFrameGizmo::CoordinateFrameGizmo(
     const IGizmo* parentGizmo, const Eigen::Affine3d& transform, const std::string& caption, double scale, const std::array<std::string, 3>& axesLabels) :
     IGizmo{ parentGizmo } {
-  m_pImpl->m_actor = vtkSmartPointer<vtkAxesActor>::New();
+  m_pImpl->setViewProp(vtkSmartPointer<vtkAxesActor>::New());
   m_captionGizmo = std::make_shared<Text3DGizmo>(this);
   m_captionGizmo->setFontSize(30);
 
@@ -36,12 +36,12 @@ Eigen::Affine3d kinverse::visualization::CoordinateFrameGizmo::getTransform() co
 
 void kinverse::visualization::CoordinateFrameGizmo::setAxesLabels(const std::array<std::string, 3>& axesLabels) {
   m_axesLabels = axesLabels;
-  auto actor = vtkAxesActor::SafeDownCast(m_pImpl->m_actor);
+  auto actor = vtkAxesActor::SafeDownCast(m_pImpl->getViewProp());
   actor->SetXAxisLabelText(m_axesLabels[0].c_str());
   actor->SetYAxisLabelText(m_axesLabels[1].c_str());
   actor->SetZAxisLabelText(m_axesLabels[2].c_str());
 
-  update();
+  render();
 }
 
 std::array<std::string, 3> kinverse::visualization::CoordinateFrameGizmo::getAxesLabels() const {
@@ -68,13 +68,13 @@ void kinverse::visualization::CoordinateFrameGizmo::updateTransform() {
   const double scale = 1000.0 * m_scale;
   csTransform->Scale(scale, scale, scale);
 
-  vtkAxesActor::SafeDownCast(m_pImpl->m_actor)->SetUserTransform(csTransform);
+  vtkAxesActor::SafeDownCast(m_pImpl->getViewProp())->SetUserTransform(csTransform);
 
-  update();
+  render();
 }
 
 void kinverse::visualization::CoordinateFrameGizmo::scaleLabels(double scale) {
-  auto actor = vtkAxesActor::SafeDownCast(m_pImpl->m_actor);
+  auto actor = vtkAxesActor::SafeDownCast(m_pImpl->getViewProp());
   for (auto label : { actor->GetXAxisCaptionActor2D(), actor->GetYAxisCaptionActor2D(), actor->GetZAxisCaptionActor2D() }) {
     label->SetWidth(label->GetWidth() * scale);
     label->SetHeight(label->GetHeight() * scale);
@@ -83,5 +83,5 @@ void kinverse::visualization::CoordinateFrameGizmo::scaleLabels(double scale) {
 
 void kinverse::visualization::CoordinateFrameGizmo::show(void* renderer) {
   IGizmo::show(renderer);
-  m_captionGizmo->show(renderer);
+  IGizmo::show(m_captionGizmo, renderer);
 }

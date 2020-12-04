@@ -8,10 +8,6 @@
  */
 
 /**
- * @todo We need to make @p show, @p hide and @p update methods private, because users must not have access to these methods. They are a part of implementation.
- */
-
-/**
  * @todo Gizmos are not thread safe yet! Changing something (e.g. MeshGizmo transform) from another thread will result in undefined behaviour.
  */
 
@@ -64,6 +60,7 @@ namespace kinverse {
        */
       virtual ~IGizmo() = default;
 
+     protected:
       /**
        * @brief This method adds all objects in the gizmo and its children to the rendering pipeline
        * @param[in] renderer - vtk renderer object (vtkSmartPointer<vtkRenderer>* is cast to void* in order to get rid of VTK dependency)
@@ -77,11 +74,45 @@ namespace kinverse {
       virtual void hide(void* renderer);
 
       /**
-       * @brief This method initiates a render call if gizmo is orphan. If gizmo has parent then this method does nothing.
+       * @brief Helper method that adds or removes gizmo to rendering pipeline.
+       * @param[in] renderer - vtk renderer object (vtkSmartPointer<vtkRenderer>* is cast to void* in order to get rid of VTK dependency)
+       * @param[in] addToPipeline - if set to true object will be added to pipeline, otherwise it will be removed from rendering pipeline
        */
-      void update();
+      void addToRenderingPipeline(void* renderer, bool addToPipeline);
 
-     protected:
+      /**
+       * @brief Each gizmo can have child gizmos, so parent gizmo must have some way to show children.
+       * But parent can't access child's show method because it is protected.
+       * So in order to get around this constraint, we introduce this static method that simply calls @p show method of the given gizmo.
+       *
+       * May be it is a dirty hack, and an indicator of bad architecture design.
+       * But it doesn't bother me, as soon as it allows to encapsulate implementation details
+       * and make show/hide methods unavailable for ordinary users of this class.
+       *
+       * @param[in] gizmo - gizmo which we want to show
+       * @param[in] renderer - vtk renderer object (vtkSmartPointer<vtkRenderer>* is cast to void* in order to get rid of VTK dependency)
+       */
+      static void show(const Ptr& gizmo, void* renderer);
+
+      /**
+       * @brief Each gizmo can have child gizmos, so parent gizmo must have some way to hide children.
+       * But parent can't access child's hide method because it is protected.
+       * So in order to get around this constraint, we introduce this static method that simply calls @p hide method of the given gizmo.
+       *
+       * May be it is a dirty hack, and an indicator of bad architecture design.
+       * But it doesn't bother me, as soon as it allows to encapsulate implementation details
+       * and make show/hide methods unavailable for ordinary users of this class.
+       *
+       * @param[in] gizmo - gizmo which we want to hide
+       * @param[in] renderer - vtk renderer object (vtkSmartPointer<vtkRenderer>* is cast to void* in order to get rid of VTK dependency)
+       */
+      static void hide(const Ptr& gizmo, void* renderer);
+
+      /**
+       * @brief This method initiates a render call if gizmo is orphan. If gizmo has a parent then this method does nothing.
+       */
+      void render();
+
       /**
        * @brief This member variable implements 'pointer to implementation' idiom in order to encapsulate VTK dependency
        */
@@ -91,6 +122,8 @@ namespace kinverse {
        * @brief Pointer to parent gizmo
        */
       const IGizmo* m_parentGizmo{ nullptr };
+
+      friend class KinverseVisualizer;
     };
 
   }  // namespace visualization

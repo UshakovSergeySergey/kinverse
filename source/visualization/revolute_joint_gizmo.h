@@ -24,6 +24,7 @@ namespace kinverse {
       void setJointIndex(unsigned int jointIndex);
       unsigned int getJointIndex() const;
 
+     protected:
       void show(void* renderer) override;
 
      private:

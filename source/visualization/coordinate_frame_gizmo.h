@@ -32,6 +32,7 @@ namespace kinverse {
       void setScale(double scale);
       double getScale() const;
 
+     protected:
       void show(void* renderer) override;
 
      private:

@@ -13,8 +13,8 @@ kinverse::visualization::RevoluteJointGizmo::RevoluteJointGizmo(const IGizmo* pa
 
 void kinverse::visualization::RevoluteJointGizmo::show(void* renderer) {
   IGizmo::show(renderer);
-  m_coordinateFrame->show(renderer);
-  m_cylinder->show(renderer);
+  IGizmo::show(m_coordinateFrame, renderer);
+  IGizmo::show(m_cylinder, renderer);
 }
 
 void kinverse::visualization::RevoluteJointGizmo::setTransform(const Eigen::Affine3d& transform) {

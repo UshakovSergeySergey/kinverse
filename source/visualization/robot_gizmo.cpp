@@ -23,7 +23,7 @@ kinverse::core::Robot::ConstPtr kinverse::visualization::RobotGizmo::getRobot() 
 void kinverse::visualization::RobotGizmo::setConfiguration(const std::vector<double>& axisValues) {
   m_axisValues = axisValues;
   robotConfigurationChanged();
-  update();
+  render();
 }
 
 std::vector<double> kinverse::visualization::RobotGizmo::getConfiguration() const {
@@ -34,13 +34,13 @@ void kinverse::visualization::RobotGizmo::robotStructureChanged() {
   // remove old robot gizmos
   {
     for (auto gizmo : m_jointGizmos) {
-      gizmo->hide(m_pImpl->m_renderer);
+      IGizmo::hide(gizmo, m_pImpl->getRenderer());
     }
     for (auto gizmo : m_linkGizmos) {
-      gizmo->hide(m_pImpl->m_renderer);
+      IGizmo::hide(gizmo, m_pImpl->getRenderer());
     }
     for (auto gizmo : m_jointMeshGizmos) {
-      gizmo->hide(m_pImpl->m_renderer);
+      IGizmo::hide(gizmo, m_pImpl->getRenderer());
     }
     m_jointGizmos.clear();
     m_linkGizmos.clear();
@@ -78,14 +78,14 @@ void kinverse::visualization::RobotGizmo::robotStructureChanged() {
 
   // draw if renderer is not nullptr
   {
-    if (m_pImpl->m_renderer) {
+    if (m_pImpl->getRenderer()) {
       for (auto gizmo : m_jointGizmos) {
-        gizmo->show(m_pImpl->m_renderer);
+        IGizmo::show(gizmo, m_pImpl->getRenderer());
       }
       for (auto gizmo : m_linkGizmos) {
-        gizmo->show(m_pImpl->m_renderer);
+        IGizmo::show(gizmo, m_pImpl->getRenderer());
       }
-      m_endEffectorGizmo->show(m_pImpl->m_renderer);
+      IGizmo::show(m_endEffectorGizmo, m_pImpl->getRenderer());
     }
   }
 }
@@ -116,15 +116,15 @@ void kinverse::visualization::RobotGizmo::robotConfigurationChanged() {
 void kinverse::visualization::RobotGizmo::show(void* renderer) {
   IGizmo::show(renderer);
   for (auto gizmo : m_jointGizmos) {
-    gizmo->show(renderer);
+    IGizmo::show(gizmo, renderer);
   }
   for (auto gizmo : m_linkGizmos) {
-    gizmo->show(renderer);
+    IGizmo::show(gizmo, renderer);
   }
   for (auto gizmo : m_jointMeshGizmos) {
-    gizmo->show(renderer);
+    IGizmo::show(gizmo, renderer);
   }
-  m_endEffectorGizmo->show(renderer);
+  IGizmo::show(m_endEffectorGizmo, renderer);
 }
 
 void kinverse::visualization::RobotGizmo::setMeshes(const std::vector<core::Mesh::ConstPtr>& jointMeshes) {

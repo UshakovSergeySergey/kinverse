@@ -123,8 +123,6 @@ int main(int argc, char** argv) {
   printConfiguration(configuration);
   printEndEffector(solvedXYZ, solvedABC);
 
-  return 0;
-
   bool flag = false;
   while (std::cin.get()) {
     flag = !flag;
@@ -135,7 +133,7 @@ int main(int argc, char** argv) {
       robotGizmo->setConfiguration(configuration);
     } else {
       robot->setConfiguration(robotConfiguration);
-      //      robotGizmo->setConfiguration(robotConfiguration);
+      robotGizmo->setConfiguration(robotConfiguration);
     }
   }
 

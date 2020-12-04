@@ -114,6 +114,7 @@
     <ClCompile Include="..\..\source\visualization\cube_gizmo.cpp" />
     <ClCompile Include="..\..\source\visualization\cylinder_gizmo.cpp" />
     <ClCompile Include="..\..\source\visualization\i_gizmo.cpp" />
+    <ClCompile Include="..\..\source\visualization\i_gizmo_impl.cpp" />
     <ClCompile Include="..\..\source\visualization\kinverse_visualizer.cpp" />
     <ClCompile Include="..\..\source\visualization\mesh_gizmo.cpp" />
     <ClCompile Include="..\..\source\visualization\mesh_to_vtk_poly_data_converter.cpp" />

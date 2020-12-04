@@ -38,6 +38,7 @@ namespace kinverse {
       void setViewportConstScale(bool viewportConstScale);
       bool getViewportConstScale() const;
 
+     protected:
       void show(void* renderer) override;
 
      private:

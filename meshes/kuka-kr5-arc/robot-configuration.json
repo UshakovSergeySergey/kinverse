@@ -1,0 +1,33 @@
+{
+	"DenavitHartenbergTable": [
+		{	"JointType": "Revolute",	"d": -400.0,	"theta":   0.0,	"r": 180.0,	"alpha":  90.0	},
+		{	"JointType": "Revolute",	"d":    0.0,	"theta":   0.0,	"r": 600.0,	"alpha":   0.0	},
+		{	"JointType": "Revolute",	"d":    0.0,	"theta": -90.0,	"r": 120.0,	"alpha":  90.0	},
+		{	"JointType": "Revolute",	"d": -620.0,	"theta":   0.0,	"r":   0.0,	"alpha": -90.0	},
+		{	"JointType": "Revolute",	"d":    0.0,	"theta":   0.0,	"r":   0.0,	"alpha":  90.0	},
+		{	"JointType": "Revolute",	"d": -115.0,	"theta": 180.0,	"r":   0.0,	"alpha": 180.0	}
+	],
+	"JointConstraints": [
+		{	"MaximumSpeed": 154.0,	"MinValue": -155.0,	"MaxValue": 155.0	},
+		{	"MaximumSpeed": 154.0,	"MinValue": -180.0,	"MaxValue":  65.0	},
+		{	"MaximumSpeed": 228.0,	"MinValue":  -15.0,	"MaxValue": 158.0	},
+		{	"MaximumSpeed": 343.0,	"MinValue": -350.0,	"MaxValue": 350.0	},
+		{	"MaximumSpeed": 384.0,	"MinValue": -130.0,	"MaxValue": 130.0	},
+		{	"MaximumSpeed": 721.0,	"MinValue": -350.0,	"MaxValue": 350.0	}
+	],
+	"BaseLinkTransform": [
+		1.0,  0.0,  0.0, 0.0,
+		0.0, -1.0,  0.0, 0.0,
+		0.0,  0.0, -1.0, 0.0,
+		0.0,  0.0,  0.0, 1.0
+	],
+	"LinkMeshes": [
+		"base-link.ply",
+		"link-1.ply",
+		"link-2.ply",
+		"link-3.ply",
+		"link-4.ply",
+		"link-5.ply",
+		"link-6.ply"
+	]
+}

@@ -11,7 +11,7 @@ kinverse::visualization::Text3DGizmo::Text3DGizmo(const IGizmo* parentGizmo,
                                                   bool faceTowardsCamera,
                                                   bool viewportConstScale) :
     IGizmo{ parentGizmo } {
-  m_pImpl->m_actor = vtkSmartPointer<vtkTextActor3D>::New();
+  m_pImpl->setViewProp(vtkSmartPointer<vtkTextActor3D>::New());
   setTransform(transform);
   setText(text);
   setFontSize(fontSize);
@@ -31,10 +31,10 @@ Eigen::Affine3d kinverse::visualization::Text3DGizmo::getTransform() const {
 
 void kinverse::visualization::Text3DGizmo::setText(const std::string& text) {
   m_text = text;
-  auto text3d = vtkTextActor3D::SafeDownCast(m_pImpl->m_actor);
+  auto text3d = vtkTextActor3D::SafeDownCast(m_pImpl->getViewProp());
   text3d->SetInput(m_text.c_str());
 
-  update();
+  render();
 }
 
 std::string kinverse::visualization::Text3DGizmo::getText() const {
@@ -43,10 +43,10 @@ std::string kinverse::visualization::Text3DGizmo::getText() const {
 
 void kinverse::visualization::Text3DGizmo::setFontSize(int fontSize) {
   m_fontSize = fontSize;
-  auto text3d = vtkTextActor3D::SafeDownCast(m_pImpl->m_actor);
+  auto text3d = vtkTextActor3D::SafeDownCast(m_pImpl->getViewProp());
   text3d->GetTextProperty()->SetFontSize(m_fontSize);
 
-  update();
+  render();
 }
 
 int kinverse::visualization::Text3DGizmo::getFontSize() const {
@@ -55,11 +55,11 @@ int kinverse::visualization::Text3DGizmo::getFontSize() const {
 
 void kinverse::visualization::Text3DGizmo::setColor(const Color& color) {
   m_color = color;
-  auto text3d = vtkTextActor3D::SafeDownCast(m_pImpl->m_actor);
+  auto text3d = vtkTextActor3D::SafeDownCast(m_pImpl->getViewProp());
   text3d->GetTextProperty()->SetColor(std::get<0>(m_color) / 255.0, std::get<1>(m_color) / 255.0, std::get<2>(m_color) / 255.0);
   text3d->GetTextProperty()->SetOpacity(std::get<3>(m_color) / 255.0);
 
-  update();
+  render();
 }
 
 kinverse::visualization::Color kinverse::visualization::Text3DGizmo::getColor() const {
@@ -90,7 +90,7 @@ void kinverse::visualization::Text3DGizmo::show(void* renderer) {
 }
 
 void kinverse::visualization::Text3DGizmo::updateSubscriptionForCameraEvents() {
-  if (!m_pImpl || !m_pImpl->m_renderer)
+  if (!m_pImpl || !m_pImpl->getRenderer())
     return;
 
   const auto callback = [this](vtkObject* caller, unsigned long eid, void*) {
@@ -110,14 +110,14 @@ void kinverse::visualization::Text3DGizmo::updateSubscriptionForCameraEvents() {
   cameraEventCallback->SetCallback(callback);
 
   const bool needToSubscribe = m_faceTowardsCamera || m_viewportConstScale;
-  const bool alreadySubscribed = m_pImpl->m_renderer->HasObserver(eventType, cameraEventCallback);
+  const bool alreadySubscribed = m_pImpl->getRenderer()->HasObserver(eventType, cameraEventCallback);
 
   if (!needToSubscribe) {
     if (alreadySubscribed)
-      m_pImpl->m_renderer->RemoveObserver(cameraEventCallback);
+      m_pImpl->getRenderer()->RemoveObserver(cameraEventCallback);
   } else {
     if (!alreadySubscribed)
-      m_pImpl->m_renderer->AddObserver(eventType, cameraEventCallback);
+      m_pImpl->getRenderer()->AddObserver(eventType, cameraEventCallback);
   }
 
   updateTextOrientationAndScale(true);
@@ -154,10 +154,10 @@ void kinverse::visualization::Text3DGizmo::updateTextOrientationAndScale(bool ne
 }
 
 bool kinverse::visualization::Text3DGizmo::getCameraPositionAndOrientation(Eigen::Vector3d& cameraPosition, Eigen::Vector3d& cameraUpVector) const {
-  if (!m_pImpl || !m_pImpl->m_renderer)
+  if (!m_pImpl || !m_pImpl->getRenderer())
     return false;
 
-  auto camera = m_pImpl->m_renderer->GetActiveCamera();
+  auto camera = m_pImpl->getRenderer()->GetActiveCamera();
   camera->GetPosition(cameraPosition.data());
   camera->GetViewUp(cameraUpVector.data());
 
@@ -171,8 +171,8 @@ void kinverse::visualization::Text3DGizmo::updateTransform(const Eigen::Affine3d
   vtkSmartPointer<vtkTransform> textTransform = vtkSmartPointer<vtkTransform>::New();
   textTransform->SetMatrix(matrix.data());
 
-  vtkTextActor3D::SafeDownCast(m_pImpl->m_actor)->SetUserTransform(textTransform);
+  vtkTextActor3D::SafeDownCast(m_pImpl->getViewProp())->SetUserTransform(textTransform);
 
   if (needsToBeRerendered)
-    update();
+    render();
 }

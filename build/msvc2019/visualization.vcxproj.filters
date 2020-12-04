@@ -107,5 +107,8 @@
     <ClCompile Include="..\..\source\visualization\mesh_to_vtk_poly_data_converter.cpp">
       <Filter>internal</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\visualization\i_gizmo_impl.cpp">
+      <Filter>internal</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

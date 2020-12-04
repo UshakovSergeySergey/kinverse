@@ -26,10 +26,11 @@ namespace kinverse {
       void setConfiguration(const std::vector<double>& axisValues);
       std::vector<double> getConfiguration() const;
 
-      void show(void* renderer) override;
-
       void showLinks(bool show);
       void showJoints(bool show);
+
+     protected:
+      void show(void* renderer) override;
 
      private:
       void robotStructureChanged();
