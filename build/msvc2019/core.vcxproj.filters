@@ -1,72 +1,68 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
+    <Filter Include="include">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="implementation">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\core\exports.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\source\core\include\kinverse\core\analytical_solver.h">
+      <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\core\joint_type.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\source\core\include\kinverse\core\denavit_hartenberg_parameters.h">
+      <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\core\robot.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\source\core\include\kinverse\core\exports.h">
+      <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\core\stdafx.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\source\core\include\kinverse\core\joint_constraints.h">
+      <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\core\denavit_hartenberg_parameters.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\source\core\include\kinverse\core\joint_type.h">
+      <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\core\joint_constraints.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\source\core\include\kinverse\core\mesh.h">
+      <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\core\robot_factory.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\source\core\include\kinverse\core\robot.h">
+      <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\core\robot_type.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\source\core\include\kinverse\core\robot_factory.h">
+      <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\core\analytical_solver.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\source\core\include\kinverse\core\robot_type.h">
+      <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\core\mesh.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\source\core\implementation\stdafx.h">
+      <Filter>implementation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\core\robot.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\source\core\implementation\analytical_solver.cpp">
+      <Filter>implementation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\core\stdafx.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\source\core\implementation\denavit_hartenberg_parameters.cpp">
+      <Filter>implementation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\core\denavit_hartenberg_parameters.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\source\core\implementation\joint_constraints.cpp">
+      <Filter>implementation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\core\joint_constraints.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\source\core\implementation\mesh.cpp">
+      <Filter>implementation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\core\robot_factory.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\source\core\implementation\robot.cpp">
+      <Filter>implementation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\core\analytical_solver.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\source\core\implementation\robot_factory.cpp">
+      <Filter>implementation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\core\mesh.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\source\core\implementation\stdafx.cpp">
+      <Filter>implementation</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

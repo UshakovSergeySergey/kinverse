@@ -1,9 +1,9 @@
 ﻿#pragma once
 
 #include "ui_main_window.h"
-#include <visualization/kinverse_visualizer.h>
-#include <visualization/robot_gizmo.h>
-#include <core/robot.h>
+#include <kinverse/visualization/kinverse_visualizer.h>
+#include <kinverse/visualization/robot_gizmo.h>
+#include <kinverse/core/robot.h>
 
 namespace kinverse {
   namespace simulator {

@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "test_denavit_hartenberg_parameters.h"
-#include <core/denavit_hartenberg_parameters.h>
+#include <kinverse/core/denavit_hartenberg_parameters.h>
 
 namespace kinverse {
   namespace core {

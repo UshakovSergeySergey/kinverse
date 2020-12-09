@@ -61,13 +61,13 @@
       <PreprocessorDefinitions>_SILENCE_CXX17_NEGATORS_DEPRECATION_WARNING;EXPORT_KINVERSE_VISUALIZATION;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <AdditionalIncludeDirectories>D:\Git\cvs-dependencies\x64\eigen-3.3.4;D:\Git\cvs-dependencies\x64\vtk-8.1.0\include\vtk-8.1;$(SolutionDir)/../../source/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/eigen-3.3.4/;$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/vtk-8.1.0/include/vtk-8.1/;$(SolutionDir)/../../source/core/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\Git\cvs-dependencies\x64\vtk-8.1.0\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/vtk-8.1.0/lib/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>vtkCommonCore-8.1-gd.lib;vtkCommonColor-8.1-gd.lib;vtkCommonComputationalGeometry-8.1-gd.lib;vtkCommonDataModel-8.1-gd.lib;vtkCommonExecutionModel-8.1-gd.lib;vtkCommonMath-8.1-gd.lib;vtkCommonTransforms-8.1-gd.lib;vtkFiltersCore-8.1-gd.lib;vtkFiltersGeneral-8.1-gd.lib;vtkFiltersHybrid-8.1-gd.lib;vtkFiltersSources-8.1-gd.lib;vtkIOGeometry-8.1-gd.lib;vtkInteractionStyle-8.1-gd.lib;vtkRenderingAnnotation-8.1-gd.lib;vtkRenderingCore-8.1-gd.lib;vtkRenderingFreeType-8.1-gd.lib;vtkRenderingLOD-8.1-gd.lib;vtkRenderingOpenGL2-8.1-gd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -80,7 +80,7 @@
       <PreprocessorDefinitions>_SILENCE_CXX17_NEGATORS_DEPRECATION_WARNING;EXPORT_KINVERSE_VISUALIZATION;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <AdditionalIncludeDirectories>D:\Git\cvs-dependencies\x64\eigen-3.3.4;D:\Git\cvs-dependencies\x64\vtk-8.1.0\include\vtk-8.1;$(SolutionDir)/../../source/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/eigen-3.3.4/;$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/vtk-8.1.0/include/vtk-8.1/;$(SolutionDir)/../../source/core/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -88,49 +88,49 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\Git\cvs-dependencies\x64\vtk-8.1.0\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/vtk-8.1.0/lib/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>vtkCommonCore-8.1.lib;vtkCommonColor-8.1.lib;vtkCommonComputationalGeometry-8.1.lib;vtkCommonDataModel-8.1.lib;vtkCommonExecutionModel-8.1.lib;vtkCommonMath-8.1.lib;vtkCommonTransforms-8.1.lib;vtkFiltersCore-8.1.lib;vtkFiltersGeneral-8.1.lib;vtkFiltersHybrid-8.1.lib;vtkFiltersSources-8.1.lib;vtkIOGeometry-8.1.lib;vtkInteractionStyle-8.1.lib;vtkRenderingAnnotation-8.1.lib;vtkRenderingCore-8.1.lib;vtkRenderingFreeType-8.1.lib;vtkRenderingLOD-8.1.lib;vtkRenderingOpenGL2-8.1.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\visualization\coordinate_frame_gizmo.h" />
-    <ClInclude Include="..\..\source\visualization\cube_gizmo.h" />
-    <ClInclude Include="..\..\source\visualization\cylinder_gizmo.h" />
-    <ClInclude Include="..\..\source\visualization\exports.h" />
-    <ClInclude Include="..\..\source\visualization\i_gizmo.h" />
-    <ClInclude Include="..\..\source\visualization\i_gizmo_impl.h" />
-    <ClInclude Include="..\..\source\visualization\kinverse_visualizer.h" />
-    <ClInclude Include="..\..\source\visualization\kinverse_visualizer_impl.h" />
-    <ClInclude Include="..\..\source\visualization\mesh_gizmo.h" />
-    <ClInclude Include="..\..\source\visualization\mesh_to_vtk_poly_data_converter.h" />
-    <ClInclude Include="..\..\source\visualization\revolute_joint_gizmo.h" />
-    <ClInclude Include="..\..\source\visualization\robot_gizmo.h" />
-    <ClInclude Include="..\..\source\visualization\stdafx.h" />
-    <ClInclude Include="..\..\source\visualization\text_3d_gizmo.h" />
-    <ClInclude Include="..\..\source\visualization\vtkCallbackCommandWrapper.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\source\visualization\coordinate_frame_gizmo.cpp" />
-    <ClCompile Include="..\..\source\visualization\cube_gizmo.cpp" />
-    <ClCompile Include="..\..\source\visualization\cylinder_gizmo.cpp" />
-    <ClCompile Include="..\..\source\visualization\i_gizmo.cpp" />
-    <ClCompile Include="..\..\source\visualization\i_gizmo_impl.cpp" />
-    <ClCompile Include="..\..\source\visualization\kinverse_visualizer.cpp" />
-    <ClCompile Include="..\..\source\visualization\mesh_gizmo.cpp" />
-    <ClCompile Include="..\..\source\visualization\mesh_to_vtk_poly_data_converter.cpp" />
-    <ClCompile Include="..\..\source\visualization\revolute_joint_gizmo.cpp" />
-    <ClCompile Include="..\..\source\visualization\robot_gizmo.cpp" />
-    <ClCompile Include="..\..\source\visualization\stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\source\visualization\text_3d_gizmo.cpp" />
-    <ClCompile Include="..\..\source\visualization\vtkCallbackCommandWrapper.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="core.vcxproj">
       <Project>{e24675be-bde0-4457-90b6-1b26d9eacc0e}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\visualization\implementation\i_gizmo_impl.h" />
+    <ClInclude Include="..\..\source\visualization\implementation\kinverse_visualizer_impl.h" />
+    <ClInclude Include="..\..\source\visualization\implementation\mesh_to_vtk_poly_data_converter.h" />
+    <ClInclude Include="..\..\source\visualization\implementation\stdafx.h" />
+    <ClInclude Include="..\..\source\visualization\implementation\vtkCallbackCommandWrapper.h" />
+    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\coordinate_frame_gizmo.h" />
+    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\cube_gizmo.h" />
+    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\cylinder_gizmo.h" />
+    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\exports.h" />
+    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\i_gizmo.h" />
+    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\kinverse_visualizer.h" />
+    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\mesh_gizmo.h" />
+    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\revolute_joint_gizmo.h" />
+    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\robot_gizmo.h" />
+    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\text_3d_gizmo.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\visualization\implementation\coordinate_frame_gizmo.cpp" />
+    <ClCompile Include="..\..\source\visualization\implementation\cube_gizmo.cpp" />
+    <ClCompile Include="..\..\source\visualization\implementation\cylinder_gizmo.cpp" />
+    <ClCompile Include="..\..\source\visualization\implementation\i_gizmo.cpp" />
+    <ClCompile Include="..\..\source\visualization\implementation\i_gizmo_impl.cpp" />
+    <ClCompile Include="..\..\source\visualization\implementation\kinverse_visualizer.cpp" />
+    <ClCompile Include="..\..\source\visualization\implementation\mesh_gizmo.cpp" />
+    <ClCompile Include="..\..\source\visualization\implementation\mesh_to_vtk_poly_data_converter.cpp" />
+    <ClCompile Include="..\..\source\visualization\implementation\revolute_joint_gizmo.cpp" />
+    <ClCompile Include="..\..\source\visualization\implementation\robot_gizmo.cpp" />
+    <ClCompile Include="..\..\source\visualization\implementation\stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\source\visualization\implementation\text_3d_gizmo.cpp" />
+    <ClCompile Include="..\..\source\visualization\implementation\vtkCallbackCommandWrapper.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

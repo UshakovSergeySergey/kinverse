@@ -80,34 +80,34 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <AdditionalIncludeDirectories>D:\Git\cvs-dependencies\x64\eigen-3.3.4;D:\Git\cvs-dependencies\x64\vtk-8.1.0\include\vtk-8.1;$(SolutionDir)/../../source/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/eigen-3.3.4/;$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/vtk-8.1.0/include/vtk-8.1/;$(SolutionDir)/../../source/math/include/;$(SolutionDir)/../../source/core/include/;$(SolutionDir)/../../source/visualization/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link />
     <Link>
-      <AdditionalLibraryDirectories>D:\Git\cvs-dependencies\x64\vtk-8.1.0\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/vtk-8.1.0/lib/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>vtkGUISupportQtOpenGL-8.1-gd.lib;vtkGUISupportQt-8.1-gd.lib;vtkRenderingCore-8.1-gd.lib;vtkCommonCore-8.1-gd.lib;vtkCommonDataModel-8.1-gd.lib;vtkCommonMath-8.1-gd.lib;vtkRenderingOpenGL2-8.1-gd.lib;vtkInteractionStyle-8.1-gd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <AdditionalIncludeDirectories>D:\Git\cvs-dependencies\x64\eigen-3.3.4;D:\Git\cvs-dependencies\x64\vtk-8.1.0\include\vtk-8.1;$(SolutionDir)/../../source/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/eigen-3.3.4/;$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/vtk-8.1.0/include/vtk-8.1/;$(SolutionDir)/../../source/math/include/;$(SolutionDir)/../../source/core/include/;$(SolutionDir)/../../source/visualization/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link />
     <Link>
-      <AdditionalLibraryDirectories>D:\Git\cvs-dependencies\x64\vtk-8.1.0\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/vtk-8.1.0/lib/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>vtkGUISupportQtOpenGL-8.1.lib;vtkGUISupportQt-8.1.lib;vtkRenderingCore-8.1.lib;vtkCommonCore-8.1.lib;vtkCommonDataModel-8.1.lib;vtkCommonMath-8.1.lib;vtkRenderingOpenGL2-8.1.lib;vtkInteractionStyle-8.1.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
-    <QtInstall>qt_5.7</QtInstall>
+    <QtInstall>qt-5.7</QtInstall>
     <QtModules>core;opengl;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
-    <QtInstall>qt_5.7</QtInstall>
+    <QtInstall>qt-5.7</QtInstall>
     <QtModules>core;opengl;widgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>

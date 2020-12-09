@@ -1,21 +1,21 @@
 ﻿#include "stdafx.h"
-#include <visualization/kinverse_visualizer.h>
-#include <visualization/coordinate_frame_gizmo.h>
-#include <visualization/revolute_joint_gizmo.h>
-#include <core/robot.h>
-#include <core/robot_factory.h>
-#include <core/analytical_solver.h>
-#include <visualization/mesh_gizmo.h>
+
+#include <kinverse/visualization/kinverse_visualizer.h>
+#include <kinverse/visualization/coordinate_frame_gizmo.h>
+#include <kinverse/visualization/revolute_joint_gizmo.h>
+#include <kinverse/visualization/mesh_gizmo.h>
+#include <kinverse/visualization/robot_gizmo.h>
+#include <kinverse/core/robot.h>
+#include <kinverse/core/robot_factory.h>
+#include <kinverse/core/analytical_solver.h>
+#include <kinverse/math/math.h>
+#include <kinverse/io/mesh_reader.h>
 
 #include <iostream>
-
 #include <vtkPLYReader.h>
 #include <vtkOBJReader.h>
 #include <vtkSTLReader.h>
-#include <visualization/robot_gizmo.h>
-#include <math/math.h>
 #include <unsupported/Eigen/EulerAngles>
-#include <io/mesh_reader.h>
 
 void printConfiguration(const std::vector<double>& configuration) {
   std::cout << std::fixed << std::showpoint << std::setprecision(5);

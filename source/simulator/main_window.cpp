@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
 #include "main_window.h"
-#include <visualization/coordinate_frame_gizmo.h>
-#include <math/math.h>
-#include <core/robot_factory.h>
+#include <kinverse/visualization/coordinate_frame_gizmo.h>
+#include <kinverse/math/math.h>
+#include <kinverse/core/robot_factory.h>
 
 kinverse::simulator::MainWindow::MainWindow(QWidget* parent) : QMainWindow{ parent } {
   m_ui.setupUi(this);

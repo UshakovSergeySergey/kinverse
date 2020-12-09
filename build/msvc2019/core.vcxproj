@@ -61,7 +61,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_SILENCE_CXX17_NEGATORS_DEPRECATION_WARNING;EXPORT_KINVERSE_CORE;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\Git\cvs-dependencies\x64\eigen-3.3.4;$(SolutionDir)/../../source/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/eigen-3.3.4/;$(SolutionDir)/../../source/math/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -78,7 +78,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_SILENCE_CXX17_NEGATORS_DEPRECATION_WARNING;EXPORT_KINVERSE_CORE;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\Git\cvs-dependencies\x64\eigen-3.3.4;$(SolutionDir)/../../source/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/eigen-3.3.4/;$(SolutionDir)/../../source/math/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -90,33 +90,33 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\core\analytical_solver.h" />
-    <ClInclude Include="..\..\source\core\denavit_hartenberg_parameters.h" />
-    <ClInclude Include="..\..\source\core\exports.h" />
-    <ClInclude Include="..\..\source\core\joint_type.h" />
-    <ClInclude Include="..\..\source\core\mesh.h" />
-    <ClInclude Include="..\..\source\core\robot.h" />
-    <ClInclude Include="..\..\source\core\joint_constraints.h" />
-    <ClInclude Include="..\..\source\core\robot_factory.h" />
-    <ClInclude Include="..\..\source\core\robot_type.h" />
-    <ClInclude Include="..\..\source\core\stdafx.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\source\core\analytical_solver.cpp" />
-    <ClCompile Include="..\..\source\core\denavit_hartenberg_parameters.cpp" />
-    <ClCompile Include="..\..\source\core\joint_constraints.cpp" />
-    <ClCompile Include="..\..\source\core\mesh.cpp" />
-    <ClCompile Include="..\..\source\core\robot.cpp" />
-    <ClCompile Include="..\..\source\core\robot_factory.cpp" />
-    <ClCompile Include="..\..\source\core\stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="math.vcxproj">
       <Project>{a73fa341-250c-43d5-8203-e9a649841f5d}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\core\implementation\stdafx.h" />
+    <ClInclude Include="..\..\source\core\include\kinverse\core\analytical_solver.h" />
+    <ClInclude Include="..\..\source\core\include\kinverse\core\denavit_hartenberg_parameters.h" />
+    <ClInclude Include="..\..\source\core\include\kinverse\core\exports.h" />
+    <ClInclude Include="..\..\source\core\include\kinverse\core\joint_constraints.h" />
+    <ClInclude Include="..\..\source\core\include\kinverse\core\joint_type.h" />
+    <ClInclude Include="..\..\source\core\include\kinverse\core\mesh.h" />
+    <ClInclude Include="..\..\source\core\include\kinverse\core\robot.h" />
+    <ClInclude Include="..\..\source\core\include\kinverse\core\robot_factory.h" />
+    <ClInclude Include="..\..\source\core\include\kinverse\core\robot_type.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\core\implementation\analytical_solver.cpp" />
+    <ClCompile Include="..\..\source\core\implementation\denavit_hartenberg_parameters.cpp" />
+    <ClCompile Include="..\..\source\core\implementation\joint_constraints.cpp" />
+    <ClCompile Include="..\..\source\core\implementation\mesh.cpp" />
+    <ClCompile Include="..\..\source\core\implementation\robot.cpp" />
+    <ClCompile Include="..\..\source\core\implementation\robot_factory.cpp" />
+    <ClCompile Include="..\..\source\core\implementation\stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

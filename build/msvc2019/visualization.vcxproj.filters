@@ -1,114 +1,101 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
+    <Filter Include="implementation">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Header Files">
+    <Filter Include="include">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="Header Files\gizmos">
-      <UniqueIdentifier>{55282d32-424f-472a-aceb-d390693a36fd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\gizmos">
-      <UniqueIdentifier>{f65f06e1-146b-4906-9c49-f013b9afb577}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="internal">
-      <UniqueIdentifier>{955a89de-1b70-45e2-b789-3d0b8400e866}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\visualization\exports.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\source\visualization\implementation\i_gizmo_impl.h">
+      <Filter>implementation</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\visualization\i_gizmo.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\source\visualization\implementation\kinverse_visualizer_impl.h">
+      <Filter>implementation</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\visualization\stdafx.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\source\visualization\implementation\mesh_to_vtk_poly_data_converter.h">
+      <Filter>implementation</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\visualization\kinverse_visualizer.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\source\visualization\implementation\stdafx.h">
+      <Filter>implementation</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\visualization\cube_gizmo.h">
-      <Filter>Header Files\gizmos</Filter>
+    <ClInclude Include="..\..\source\visualization\implementation\vtkCallbackCommandWrapper.h">
+      <Filter>implementation</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\visualization\cylinder_gizmo.h">
-      <Filter>Header Files\gizmos</Filter>
+    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\coordinate_frame_gizmo.h">
+      <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\visualization\text_3d_gizmo.h">
-      <Filter>Header Files\gizmos</Filter>
+    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\cube_gizmo.h">
+      <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\visualization\coordinate_frame_gizmo.h">
-      <Filter>Header Files\gizmos</Filter>
+    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\cylinder_gizmo.h">
+      <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\visualization\i_gizmo_impl.h">
-      <Filter>internal</Filter>
+    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\i_gizmo.h">
+      <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\visualization\vtkCallbackCommandWrapper.h">
-      <Filter>internal</Filter>
+    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\kinverse_visualizer.h">
+      <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\visualization\revolute_joint_gizmo.h">
-      <Filter>Header Files\gizmos</Filter>
+    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\mesh_gizmo.h">
+      <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\visualization\kinverse_visualizer_impl.h">
-      <Filter>internal</Filter>
+    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\revolute_joint_gizmo.h">
+      <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\visualization\robot_gizmo.h">
-      <Filter>Header Files\gizmos</Filter>
+    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\robot_gizmo.h">
+      <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\visualization\mesh_gizmo.h">
-      <Filter>Header Files\gizmos</Filter>
+    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\text_3d_gizmo.h">
+      <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\visualization\mesh_to_vtk_poly_data_converter.h">
-      <Filter>internal</Filter>
+    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\exports.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\visualization\stdafx.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\source\visualization\implementation\coordinate_frame_gizmo.cpp">
+      <Filter>implementation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\visualization\i_gizmo.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\source\visualization\implementation\cube_gizmo.cpp">
+      <Filter>implementation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\visualization\kinverse_visualizer.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\source\visualization\implementation\cylinder_gizmo.cpp">
+      <Filter>implementation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\visualization\cube_gizmo.cpp">
-      <Filter>Source Files\gizmos</Filter>
+    <ClCompile Include="..\..\source\visualization\implementation\i_gizmo.cpp">
+      <Filter>implementation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\visualization\cylinder_gizmo.cpp">
-      <Filter>Source Files\gizmos</Filter>
+    <ClCompile Include="..\..\source\visualization\implementation\i_gizmo_impl.cpp">
+      <Filter>implementation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\visualization\text_3d_gizmo.cpp">
-      <Filter>Source Files\gizmos</Filter>
+    <ClCompile Include="..\..\source\visualization\implementation\kinverse_visualizer.cpp">
+      <Filter>implementation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\visualization\coordinate_frame_gizmo.cpp">
-      <Filter>Source Files\gizmos</Filter>
+    <ClCompile Include="..\..\source\visualization\implementation\mesh_gizmo.cpp">
+      <Filter>implementation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\visualization\vtkCallbackCommandWrapper.cpp">
-      <Filter>internal</Filter>
+    <ClCompile Include="..\..\source\visualization\implementation\mesh_to_vtk_poly_data_converter.cpp">
+      <Filter>implementation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\visualization\revolute_joint_gizmo.cpp">
-      <Filter>Source Files\gizmos</Filter>
+    <ClCompile Include="..\..\source\visualization\implementation\revolute_joint_gizmo.cpp">
+      <Filter>implementation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\visualization\robot_gizmo.cpp">
-      <Filter>Source Files\gizmos</Filter>
+    <ClCompile Include="..\..\source\visualization\implementation\robot_gizmo.cpp">
+      <Filter>implementation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\visualization\mesh_gizmo.cpp">
-      <Filter>Source Files\gizmos</Filter>
+    <ClCompile Include="..\..\source\visualization\implementation\stdafx.cpp">
+      <Filter>implementation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\visualization\mesh_to_vtk_poly_data_converter.cpp">
-      <Filter>internal</Filter>
+    <ClCompile Include="..\..\source\visualization\implementation\text_3d_gizmo.cpp">
+      <Filter>implementation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\visualization\i_gizmo_impl.cpp">
-      <Filter>internal</Filter>
+    <ClCompile Include="..\..\source\visualization\implementation\vtkCallbackCommandWrapper.cpp">
+      <Filter>implementation</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
