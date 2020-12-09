@@ -34,32 +34,6 @@
 
 #include "exports.h"
 
-/**
- * @todo We need to get rid of a raw pointer to parent, because I don't like raw pointers. But we cant use smart pointer here either, because even if we
- * inherit @p enable_shared_from_this it won't work, as object must be fully constructed before calling @p shared_from_this method
- */
-
-/**
- * @todo Gizmos are not thread safe yet! Changing something (e.g. MeshGizmo transform) from another thread will result in undefined behaviour.
- */
-
-/**
- * @todo Almost every gizmo has transform and color, maybe we need to try refactor it
- * and make setTransform, getTransform, setColor, getColor methods part of IGizmo interface
- */
-
-/**
- * @todo What if scale for CoordinateFrameGizmo would be negative?
- */
-
-/**
- * @todo Maybe we need to make CoordinateFrameGizmo::scaleLabels public?
- */
-
-/**
- * @todo Hide method not implemented for gizmos.
- */
-
 namespace kinverse {
   namespace visualization {
 
