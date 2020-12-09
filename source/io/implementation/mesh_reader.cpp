@@ -13,14 +13,14 @@ kinverse::core::Mesh::Ptr convertMesh(vtkSmartPointer<vtkPolyData> vtkMesh) {
     vertices.push_back(point);
   }
 
-  std::vector<std::vector<unsigned int>> faces{};
+  std::vector<std::vector<unsigned long long>> faces{};
   polygons->InitTraversal();
   for (auto faceCounter = 0u; faceCounter < polygons->GetNumberOfCells(); ++faceCounter) {
     vtkIdType numberOfVerticesInFace = 0;
     vtkIdType* faceIndices = nullptr;
     polygons->GetNextCell(numberOfVerticesInFace, faceIndices);
 
-    std::vector<unsigned int> face{};
+    std::vector<unsigned long long> face{};
     for (auto vertexCounter = 0u; vertexCounter < numberOfVerticesInFace; ++vertexCounter) {
       face.push_back(faceIndices[vertexCounter]);
     }
