@@ -31,46 +31,72 @@
  */
 
 #include "stdafx.h"
-#include "../include/kinverse/visualization/revolute_joint_gizmo.h"
+#include "../include/kinverse/visualization/cube_gizmo.h"
+#include "../include/kinverse/visualization/cylinder_gizmo.h"
+#include "../include/kinverse/visualization/joint_gizmo.h"
 
-kinverse::visualization::RevoluteJointGizmo::RevoluteJointGizmo(const IGizmo* parentGizmo, const Eigen::Affine3d& transform, unsigned int jointIndex) :
+kinverse::visualization::JointGizmo::JointGizmo(const IGizmo* parentGizmo,
+                                                core::JointType jointType,
+                                                const Eigen::Affine3d& transform,
+                                                unsigned int jointIndex) :
     IGizmo{ parentGizmo } {
   m_coordinateFrame = std::make_shared<CoordinateFrameGizmo>(this);
   m_coordinateFrame->setAxesLength(250.0);
-  m_cylinder = std::make_shared<CylinderGizmo>(this);
+  m_jointMesh = std::make_shared<CylinderGizmo>(this);
 
+  setJointType(jointType);
   setTransform(transform);
   setJointIndex(jointIndex);
 }
 
-void kinverse::visualization::RevoluteJointGizmo::show(void* renderer) {
+void kinverse::visualization::JointGizmo::show(void* renderer) {
   IGizmo::show(renderer);
   IGizmo::show(m_coordinateFrame, renderer);
-  IGizmo::show(m_cylinder, renderer);
+  IGizmo::show(m_jointMesh, renderer);
 }
 
-void kinverse::visualization::RevoluteJointGizmo::setTransform(const Eigen::Affine3d& transform) {
+void kinverse::visualization::JointGizmo::setJointType(core::JointType jointType) {
+  if (m_jointType == jointType)
+    return;
+  m_jointType = jointType;
+
+  IGizmo::hide(m_jointMesh);
+
+  if (m_jointType == core::JointType::Revolute)
+    m_jointMesh = std::make_shared<CylinderGizmo>(this, m_transform);
+  else
+    m_jointMesh = std::make_shared<CubeGizmo>(this, m_transform);
+
+  IGizmo::show(m_jointMesh);
+}
+
+kinverse::core::JointType kinverse::visualization::JointGizmo::getJointType() const {
+  return m_jointType;
+}
+
+void kinverse::visualization::JointGizmo::setTransform(const Eigen::Affine3d& transform) {
   m_transform = transform;
   m_coordinateFrame->setTransform(transform);
-  m_cylinder->setTransform(transform);
+
+  if (m_jointType == core::JointType::Revolute)
+    std::dynamic_pointer_cast<CylinderGizmo>(m_jointMesh)->setTransform(transform);
+  else
+    std::dynamic_pointer_cast<CubeGizmo>(m_jointMesh)->setTransform(transform);
 }
 
-Eigen::Affine3d kinverse::visualization::RevoluteJointGizmo::getTransform() const {
+Eigen::Affine3d kinverse::visualization::JointGizmo::getTransform() const {
   return m_transform;
 }
 
-void kinverse::visualization::RevoluteJointGizmo::setJointIndex(unsigned int jointIndex) {
+void kinverse::visualization::JointGizmo::setJointIndex(unsigned int jointIndex) {
   m_jointIndex = jointIndex;
 
   const auto index = std::to_string(m_jointIndex);
-
-  m_coordinateFrame->setCaption("frame" + index);
-  m_coordinateFrame->setCaption("");
 
   const std::array<std::string, 3> axisLabels{ "X" + index, "Y" + index, "Z" + index };
   m_coordinateFrame->setAxesLabels(axisLabels);
 }
 
-unsigned int kinverse::visualization::RevoluteJointGizmo::getJointIndex() const {
+unsigned int kinverse::visualization::JointGizmo::getJointIndex() const {
   return m_jointIndex;
 }

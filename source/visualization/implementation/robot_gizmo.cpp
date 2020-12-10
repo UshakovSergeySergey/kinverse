@@ -32,7 +32,7 @@
 
 #include "stdafx.h"
 #include "../include/kinverse/visualization/robot_gizmo.h"
-#include "../include/kinverse/visualization/revolute_joint_gizmo.h"
+#include "../include/kinverse/visualization/joint_gizmo.h"
 #include "i_gizmo_impl.h"
 
 kinverse::visualization::RobotGizmo::RobotGizmo(const IGizmo* parentGizmo, core::Robot::ConstPtr robot) : IGizmo{ parentGizmo } {
@@ -84,7 +84,7 @@ void kinverse::visualization::RobotGizmo::robotStructureChanged() {
     const auto joints = m_robot->getJointCoordinateFrames();
     const auto numberOfJoints = joints.size();
     for (auto jointCounter = 0u; jointCounter < numberOfJoints; ++jointCounter) {
-      auto jointGizmo = std::make_shared<RevoluteJointGizmo>(this, joints[jointCounter], jointCounter);
+      auto jointGizmo = std::make_shared<JointGizmo>(this, core::JointType::Revolute, joints[jointCounter], jointCounter);
       m_jointGizmos.push_back(jointGizmo);
 
       auto jointMeshGizmo = std::make_shared<MeshGizmo>(this);

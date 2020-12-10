@@ -44,9 +44,6 @@
     <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\mesh_gizmo.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\revolute_joint_gizmo.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\robot_gizmo.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -54,6 +51,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\exports.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\joint_gizmo.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -82,9 +82,6 @@
     <ClCompile Include="..\..\source\visualization\implementation\mesh_to_vtk_poly_data_converter.cpp">
       <Filter>implementation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\visualization\implementation\revolute_joint_gizmo.cpp">
-      <Filter>implementation</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\visualization\implementation\robot_gizmo.cpp">
       <Filter>implementation</Filter>
     </ClCompile>
@@ -95,6 +92,9 @@
       <Filter>implementation</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\visualization\implementation\vtkCallbackCommandWrapper.cpp">
+      <Filter>implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\visualization\implementation\joint_gizmo.cpp">
       <Filter>implementation</Filter>
     </ClCompile>
   </ItemGroup>

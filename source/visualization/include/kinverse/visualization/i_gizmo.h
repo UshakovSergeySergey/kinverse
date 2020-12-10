@@ -115,7 +115,7 @@ namespace kinverse {
        * @param[in] gizmo - gizmo which we want to show
        * @param[in] renderer - vtk renderer object (vtkSmartPointer<vtkRenderer>* is cast to void* in order to get rid of VTK dependency)
        */
-      static void show(const Ptr& gizmo, void* renderer);
+      static void show(const Ptr& gizmo, void* renderer = nullptr);
 
       /**
        * @brief Each gizmo can have child gizmos, so parent gizmo must have some way to hide children.
@@ -129,7 +129,7 @@ namespace kinverse {
        * @param[in] gizmo - gizmo which we want to hide
        * @param[in] renderer - vtk renderer object (vtkSmartPointer<vtkRenderer>* is cast to void* in order to get rid of VTK dependency)
        */
-      static void hide(const Ptr& gizmo, void* renderer);
+      static void hide(const Ptr& gizmo, void* renderer = nullptr);
 
       /**
        * @brief This method initiates a render call if gizmo is orphan. If gizmo has a parent then this method does nothing.

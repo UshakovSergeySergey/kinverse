@@ -34,38 +34,40 @@
 
 #include "exports.h"
 #include "i_gizmo.h"
-#include "cylinder_gizmo.h"
 #include "coordinate_frame_gizmo.h"
+#include <kinverse/core/joint_type.h>
 
 namespace kinverse {
   namespace visualization {
 
     /**
-     * @class RevoluteJointGizmo
-     * @brief This gizmo is used for rendering revolute joints.
+     * @class JointGizmo
+     * @brief This gizmo is used for rendering joints (revolute or prismatic).
      * It comes handy when you want to draw kinematic diagram of the robot.
      */
-    class KINVERSE_VISUALIZATION_API RevoluteJointGizmo : public IGizmo {
+    class KINVERSE_VISUALIZATION_API JointGizmo : public IGizmo {
      public:
       /**
-       * @brief Smart pointer to @p RevoluteJointGizmo
+       * @brief Smart pointer to @p JointGizmo
        */
-      using Ptr = std::shared_ptr<RevoluteJointGizmo>;
+      using Ptr = std::shared_ptr<JointGizmo>;
 
       /**
-       * @brief Smart pointer to const @p RevoluteJointGizmo
+       * @brief Smart pointer to const @p JointGizmo
        */
-      using ConstPtr = std::shared_ptr<const RevoluteJointGizmo>;
+      using ConstPtr = std::shared_ptr<const JointGizmo>;
 
       /**
        * @brief Simple constructor that allows to set joint parameters.
        * @param[in] parentGizmo - parent gizmo
+       * @param[in] jointType - joint type
        * @param[in] transform - position and orientation of the joint
-       * @param[in] jointIndex - this index is used for labeling. Each joint has label in the format 'frame' + jointIndex (e.g. frame1)
+       * @param[in] jointIndex - this index is used for labeling axes (e.g. X1, Y1 and Z1)
        */
-      explicit RevoluteJointGizmo(const IGizmo* parentGizmo = nullptr,
-                                  const Eigen::Affine3d& transform = Eigen::Affine3d::Identity(),
-                                  unsigned int jointIndex = 0);
+      explicit JointGizmo(const IGizmo* parentGizmo = nullptr,
+                          core::JointType jointType = core::JointType::Revolute,
+                          const Eigen::Affine3d& transform = Eigen::Affine3d::Identity(),
+                          unsigned int jointIndex = 0);
 
       /**
        * @brief Sets up joints transform.
@@ -79,19 +81,30 @@ namespace kinverse {
       Eigen::Affine3d getTransform() const;
 
       /**
-       * @brief Sets joint index. This index is used for labeling joint in the format 'frame' + jointIndex (e.g. frame5).
+       * @brief Sets joint type (revolute or prismatic).
+       * @param[in] jointType - joint type
+       */
+      void setJointType(core::JointType jointType);
+
+      /**
+       * @brief Returns joint type.
+       */
+      core::JointType getJointType() const;
+
+      /**
+       * @brief Sets joint index. This index is used for labeling axes (e.g. X5, Y5 and Z5).
        * @param[in] jointIndex - joint index
        */
       void setJointIndex(unsigned int jointIndex);
 
       /**
-       * @brief Returns joint index used for labeling
+       * @brief Returns joint index used for axes labeling
        */
       unsigned int getJointIndex() const;
 
      protected:
       /**
-       * @brief Revolute joint is compound gizmo, so we need to override default @p show method.
+       * @brief JointGizmo is compound gizmo, so we need to override default @p show method.
        * This method simply tells how to render this complex gizmo.
        * @param[in] renderer - vtk renderer object (vtkSmartPointer<vtkRenderer>* is cast to void* in order to get rid of VTK dependency)
        */
@@ -99,23 +112,30 @@ namespace kinverse {
 
      private:
       /**
-       * @brief Stores position and orientation of the revolute joint, the place it would be drawn.
+       * @brief Stores position and orientation of the joint, the place it would be drawn.
        */
       Eigen::Affine3d m_transform{ Eigen::Affine3d::Identity() };
 
       /**
-       * @brief Stores joint index which is used for labeling.
+       * @brief Stores joint type.
+       */
+      core::JointType m_jointType{ core::JointType::Revolute };
+
+      /**
+       * @brief Stores joint index which is used for axes labeling.
        */
       unsigned int m_jointIndex{ 0 };
 
       /**
-       * @brief Revolute joints usually drawn with cylinders on the kinematic diagrams.
-       * So we store a cylinder here.
+       * @brief Here we store joint mesh corresponding to joint type.
+       * Revolute joints are usually drawn with cylinders on the kinematic diagrams,
+       * and prismatic joints are drawn with cubes.
        */
-      CylinderGizmo::Ptr m_cylinder{ nullptr };
+      IGizmo::Ptr m_jointMesh{ nullptr };
 
       /**
-       * @brief Stores coordinate frame of a joint. Z axis is the axis of rotation.
+       * @brief Stores coordinate frame of a joint. Z axis is the axis of rotation
+       * in case of revolute joint or axis of linear motion in case of prismatic joint.
        */
       CoordinateFrameGizmo::Ptr m_coordinateFrame{ nullptr };
     };

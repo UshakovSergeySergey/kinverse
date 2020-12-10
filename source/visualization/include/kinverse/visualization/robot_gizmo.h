@@ -35,7 +35,7 @@
 #include "exports.h"
 #include "i_gizmo.h"
 #include <kinverse/core/robot.h>
-#include "revolute_joint_gizmo.h"
+#include "joint_gizmo.h"
 #include "mesh_gizmo.h"
 
 namespace kinverse {
@@ -71,7 +71,7 @@ namespace kinverse {
       std::vector<double> m_axisValues{};
       std::vector<core::Mesh::ConstPtr> m_meshes{};
 
-      std::vector<RevoluteJointGizmo::Ptr> m_jointGizmos{};
+      std::vector<JointGizmo::Ptr> m_jointGizmos{};
       std::vector<CoordinateFrameGizmo::Ptr> m_linkGizmos{};
       std::vector<MeshGizmo::Ptr> m_jointMeshGizmos{};
       CoordinateFrameGizmo::Ptr m_endEffectorGizmo{ nullptr };

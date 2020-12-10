@@ -50,8 +50,7 @@ void kinverse::visualization::IGizmo::hide(void* renderer) {
 void kinverse::visualization::IGizmo::addToRenderingPipeline(void* renderer_, bool addToPipeline) const {
   if (!m_pImpl->getRenderer()) {
     if (renderer_ == nullptr)
-      throw std::invalid_argument(
-          "addToRenderingPipeline() failed! Received nullptr instead of a valid renderer! It is an internal error, there is nothing you can do about it!");
+      return;
 
     const auto renderer = *static_cast<vtkSmartPointer<vtkRenderer>*>(renderer_);
     m_pImpl->setRenderer(renderer);

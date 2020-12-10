@@ -2,7 +2,7 @@
 
 #include <kinverse/visualization/kinverse_visualizer.h>
 #include <kinverse/visualization/coordinate_frame_gizmo.h>
-#include <kinverse/visualization/revolute_joint_gizmo.h>
+#include <kinverse/visualization/joint_gizmo.h>
 #include <kinverse/visualization/mesh_gizmo.h>
 #include <kinverse/visualization/robot_gizmo.h>
 #include <kinverse/core/robot.h>

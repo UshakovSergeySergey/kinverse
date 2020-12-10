@@ -110,7 +110,7 @@
     <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\i_gizmo.h" />
     <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\kinverse_visualizer.h" />
     <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\mesh_gizmo.h" />
-    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\revolute_joint_gizmo.h" />
+    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\joint_gizmo.h" />
     <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\robot_gizmo.h" />
     <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\text_3d_gizmo.h" />
   </ItemGroup>
@@ -123,7 +123,7 @@
     <ClCompile Include="..\..\source\visualization\implementation\kinverse_visualizer.cpp" />
     <ClCompile Include="..\..\source\visualization\implementation\mesh_gizmo.cpp" />
     <ClCompile Include="..\..\source\visualization\implementation\mesh_to_vtk_poly_data_converter.cpp" />
-    <ClCompile Include="..\..\source\visualization\implementation\revolute_joint_gizmo.cpp" />
+    <ClCompile Include="..\..\source\visualization\implementation\joint_gizmo.cpp" />
     <ClCompile Include="..\..\source\visualization\implementation\robot_gizmo.cpp" />
     <ClCompile Include="..\..\source\visualization\implementation\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
