@@ -23,8 +23,25 @@ namespace kinverse {
       void setConfiguration(const std::vector<double>& configuration);
       std::vector<double> getConfiguration() const;
 
+      /**
+       * For example KUKA KR5 Arc has its first axis pointing down, if you'll build kinematic diagram for KUKA you'll see
+       * that the whole robot seems to be upside down (end effector has negative z values).
+       * But in real life KUKA's end effector has positive z values. It is because base transform rotates robot about X axis 180 degrees
+       * In order to fix this it comes handy to add some base transform.
+       * Do not confuse base transform with robot transform.
+       * Base transform tells how we need to rotate and translate robot (its kinematic diagram) in order to get robots local coordinate frame.
+       * Whether robot transform tells how is robot positioned and oriented in the world.
+       */
       void setBaseTransform(const Eigen::Affine3d& transform);
       Eigen::Affine3d getBaseTransform() const;
+
+      void setTransform(const Eigen::Affine3d& transform);
+      Eigen::Affine3d getTransform() const;
+
+
+
+
+
 
       unsigned int getNumberOfJoints() const;
       unsigned int getNumberOfLinks() const;
