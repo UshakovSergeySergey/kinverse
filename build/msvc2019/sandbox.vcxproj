@@ -62,7 +62,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_SILENCE_CXX17_NEGATORS_DEPRECATION_WARNING;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/vtk-8.1.0/include/vtk-8.1/;$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/eigen-3.3.4/;$(SolutionDir)/../../source/math/include/;$(SolutionDir)/../../source/core/include/;$(SolutionDir)/../../source/io/include/;$(SolutionDir)/../../source/visualization/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/vtk-8.1.0/include/vtk-8.1/;$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/eigen-3.3.4/;$(SolutionDir)/../../source/factory/include/;$(SolutionDir)/../../source/math/include/;$(SolutionDir)/../../source/core/include/;$(SolutionDir)/../../source/io/include/;$(SolutionDir)/../../source/visualization/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -81,7 +81,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_SILENCE_CXX17_NEGATORS_DEPRECATION_WARNING;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/vtk-8.1.0/include/vtk-8.1/;$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/eigen-3.3.4/;$(SolutionDir)/../../source/math/include/;$(SolutionDir)/../../source/core/include/;$(SolutionDir)/../../source/io/include/;$(SolutionDir)/../../source/visualization/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/vtk-8.1.0/include/vtk-8.1/;$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/eigen-3.3.4/;$(SolutionDir)/../../source/factory/include/;$(SolutionDir)/../../source/math/include/;$(SolutionDir)/../../source/core/include/;$(SolutionDir)/../../source/io/include/;$(SolutionDir)/../../source/visualization/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -105,6 +105,9 @@
   <ItemGroup>
     <ProjectReference Include="core.vcxproj">
       <Project>{e24675be-bde0-4457-90b6-1b26d9eacc0e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="factory.vcxproj">
+      <Project>{0e8c7bd3-70ba-4b56-8f4b-84e620adb36c}</Project>
     </ProjectReference>
     <ProjectReference Include="io.vcxproj">
       <Project>{ab876d62-6e9c-44fa-9d86-78ce02fb0ebf}</Project>

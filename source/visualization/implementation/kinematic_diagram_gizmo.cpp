@@ -31,38 +31,41 @@
  */
 
 #include "stdafx.h"
-#include "../include/kinverse/visualization/robot_gizmo.h"
+#include "../include/kinverse/visualization/kinematic_diagram_gizmo.h"
 
-kinverse::visualization::RobotGizmo::RobotGizmo(const IGizmo* parentGizmo, core::Robot::ConstPtr robot) : IGizmo{ parentGizmo } {
+kinverse::visualization::KinematicDiagramGizmo::KinematicDiagramGizmo(const IGizmo* parentGizmo, core::Robot::ConstPtr robot) : IGizmo{ parentGizmo } {
   setRobot(robot);
 }
 
-void kinverse::visualization::RobotGizmo::setRobot(core::Robot::ConstPtr robot) {
+void kinverse::visualization::KinematicDiagramGizmo::setRobot(core::Robot::ConstPtr robot) {
   m_robot = robot;
 
   updateRobotStructure();
   updateRobotConfiguration();
 }
 
-kinverse::core::Robot::ConstPtr kinverse::visualization::RobotGizmo::getRobot() const {
+kinverse::core::Robot::ConstPtr kinverse::visualization::KinematicDiagramGizmo::getRobot() const {
   return m_robot;
 }
 
-void kinverse::visualization::RobotGizmo::updateRobotStructure() {
+void kinverse::visualization::KinematicDiagramGizmo::updateRobotStructure() {
   hide();
 
-  m_meshes.clear();
-  m_meshGizmos.clear();
+  m_jointGizmos.clear();
   m_endEffectorGizmo = nullptr;
 
   if (!m_robot)
     return;
 
-  // create meshes
-  const auto meshes = m_robot->getMeshes();
-  for (const auto& mesh : meshes) {
-    auto meshGizmo = std::make_shared<MeshGizmo>(this, mesh);
-    m_meshGizmos.push_back(meshGizmo);
+  const auto dhTable = m_robot->getDHTable();
+  for (auto jointCounter = 0u; jointCounter < dhTable.size(); ++jointCounter) {
+    // create joints
+    auto jointGizmo = std::make_shared<JointGizmo>(this, dhTable[jointCounter].getJointType(), Eigen::Affine3d::Identity(), jointCounter);
+    m_jointGizmos.push_back(jointGizmo);
+
+    // create link between current joint and the next one
+    auto linkGizmo = std::make_shared<LinkGizmo>(this, dhTable[jointCounter]);
+    m_linkGizmos.push_back(linkGizmo);
   }
 
   // create end effector
@@ -72,43 +75,44 @@ void kinverse::visualization::RobotGizmo::updateRobotStructure() {
   show();
 }
 
-void kinverse::visualization::RobotGizmo::updateRobotConfiguration() {
+void kinverse::visualization::KinematicDiagramGizmo::updateRobotConfiguration() {
   if (!m_robot)
     return;
 
-  const auto linkTransforms = m_robot->getLinkCoordinateFrames();
-  const auto dhTable = m_robot->getDHTable();
-  const auto robotConfiguration = m_robot->getConfiguration();
+  const auto joints = m_robot->getJointCoordinateFrames();
+  for (auto jointCounter = 0u; jointCounter < joints.size(); ++jointCounter) {
+    // update joints
+    m_jointGizmos[jointCounter]->setTransform(joints[jointCounter]);
 
-  // update base link mesh
-  m_meshGizmos.front()->setTransform(linkTransforms.front());
-
-  // update link meshes
-  for (auto linkCounter = 0u; linkCounter < linkTransforms.size() - 1; ++linkCounter) {
-    const Eigen::Affine3d jointTransform = dhTable[linkCounter].getTransformZ(robotConfiguration[linkCounter]);
-    const Eigen::Affine3d transform = linkTransforms[linkCounter] * jointTransform;
-    m_meshGizmos[linkCounter + 1]->setTransform(transform);
+    // update link between current joint and the next one
+    m_linkGizmos[jointCounter]->setTransform(joints[jointCounter]);
   }
 
   // update end effector
-  const Eigen::Affine3d endEffectorTransform = linkTransforms.back();
+  const Eigen::Affine3d endEffectorTransform = m_robot->getLinkCoordinateFrames().back();
   m_endEffectorGizmo->setTransform(endEffectorTransform);
 
   render();
 }
 
-void kinverse::visualization::RobotGizmo::show(void* renderer) {
+void kinverse::visualization::KinematicDiagramGizmo::show(void* renderer) {
   if (m_endEffectorGizmo)
     IGizmo::show(m_endEffectorGizmo, renderer);
-  for (const auto& mesh : m_meshGizmos)
-    IGizmo::show(mesh, renderer);
+  for (const auto& joint : m_jointGizmos)
+    IGizmo::show(joint, renderer);
+  for (const auto& joint : m_linkGizmos)
+    IGizmo::show(joint, renderer);
   IGizmo::show(renderer);
 }
 
-void kinverse::visualization::RobotGizmo::hide(void* renderer) {
+void kinverse::visualization::KinematicDiagramGizmo::hide(void* renderer) {
   if (m_endEffectorGizmo)
     IGizmo::hide(m_endEffectorGizmo, renderer);
-  for (const auto& mesh : m_meshGizmos)
-    IGizmo::hide(mesh, renderer);
+  for (const auto& joint : m_jointGizmos)
+    IGizmo::hide(joint, renderer);
+  for (const auto& joint : m_linkGizmos)
+    IGizmo::hide(joint, renderer);
   IGizmo::hide(renderer);
+
+  //@todo we need to show/hide childs before parent, because parent initiates render call
 }

@@ -226,3 +226,11 @@ void kinverse::core::Robot::setBaseTransform(const Eigen::Affine3d& transform) {
 Eigen::Affine3d kinverse::core::Robot::getBaseTransform() const {
   return m_baseTransform;
 }
+
+void kinverse::core::Robot::setMeshes(const std::vector<Mesh::ConstPtr>& meshes) {
+  m_meshes = meshes;
+}
+
+std::vector<kinverse::core::Mesh::ConstPtr> kinverse::core::Robot::getMeshes() const {
+  return m_meshes;
+}

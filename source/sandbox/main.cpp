@@ -6,7 +6,7 @@
 #include <kinverse/visualization/mesh_gizmo.h>
 #include <kinverse/visualization/robot_gizmo.h>
 #include <kinverse/core/robot.h>
-#include <kinverse/core/robot_factory.h>
+#include <kinverse/factory/robot_factory.h>
 #include <kinverse/core/analytical_solver.h>
 #include <kinverse/math/math.h>
 #include <kinverse/io/mesh_reader.h>
@@ -39,27 +39,15 @@ void printEndEffector(const Eigen::Vector3d& xyz, const Eigen::Vector3d& abc) {
             << kinverse::math::radiansToDegrees(abc.z()) << ")" << std::endl;
 }
 
-int main(int argc, char** argv) {
-  std::vector<kinverse::core::Mesh::ConstPtr> meshes{};
-  {
-    const std::vector<std::string> axisMeshFilenames{
-      "D:/Git/kinverse/meshes/kuka-kr5-arc/link-1.ply",  //
-      "D:/Git/kinverse/meshes/kuka-kr5-arc/link-2.ply",  //
-      "D:/Git/kinverse/meshes/kuka-kr5-arc/link-3.ply",  //
-      "D:/Git/kinverse/meshes/kuka-kr5-arc/link-4.ply",  //
-      "D:/Git/kinverse/meshes/kuka-kr5-arc/link-5.ply",  //
-      "D:/Git/kinverse/meshes/kuka-kr5-arc/link-6.ply"   //
-    };
-    for (auto filename : axisMeshFilenames) {
-      meshes.push_back(kinverse::io::MeshReader().read(filename));
-    }
-  }
+int debugVisualizer();
 
+int main(int argc, char** argv) {
+  return debugVisualizer();
   // бага, если поставить робота в конфигурацию (0, 0, 0, 0, 0, 0) и взять координаты endeffector как таргет для ik, решение будет странным, почему он
   // складывается в гармошку?
 
   // create robot
-  auto robot = kinverse::core::RobotFactory::create(kinverse::core::RobotType::KukaKR5Arc);
+  auto robot = kinverse::factory::RobotFactory::create(kinverse::core::RobotType::KukaKR5Arc);
 
   // set robot initial configuration
   const std::vector<double> robotConfiguration{ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
@@ -85,8 +73,6 @@ int main(int argc, char** argv) {
   auto kinverseVisualizer = std::make_shared<kinverse::visualization::KinverseVisualizer>();
 
   auto robotGizmo = std::make_shared<kinverse::visualization::RobotGizmo>(nullptr, robot);
-  robotGizmo->setConfiguration(robotConfiguration);
-  robotGizmo->setMeshes(meshes);
   kinverseVisualizer->addGizmo(robotGizmo);
 
   auto worldGizmo = std::make_shared<kinverse::visualization::CoordinateFrameGizmo>(nullptr);
@@ -105,7 +91,7 @@ int main(int argc, char** argv) {
 
   // set robot configuration
   robot->setConfiguration(configuration);
-  robotGizmo->setConfiguration(configuration);
+  robotGizmo->updateRobotConfiguration();
 
   // print info
   const Eigen::Affine3d solvedTransform = robot->getLinkCoordinateFrames().back();
@@ -113,29 +99,29 @@ int main(int argc, char** argv) {
   Eigen::Vector3d solvedABC;
   kinverse::math::toXYZABC(solvedTransform, solvedXYZ, solvedABC);
 
-  std::cout << std::endl;
-  std::cout << "Initial configuration:" << std::endl;
-  printConfiguration(robotConfiguration);
-  printEndEffector(targetXYZ, targetABC);
-  std::cout << std::endl;
+  // std::cout << std::endl;
+  // std::cout << "Initial configuration:" << std::endl;
+  // printConfiguration(robotConfiguration);
+  // printEndEffector(targetXYZ, targetABC);
+  // std::cout << std::endl;
 
-  std::cout << "Solved configuration:" << std::endl;
-  printConfiguration(configuration);
-  printEndEffector(solvedXYZ, solvedABC);
+  // std::cout << "Solved configuration:" << std::endl;
+  // printConfiguration(configuration);
+  // printEndEffector(solvedXYZ, solvedABC);
 
-  bool flag = false;
-  while (std::cin.get()) {
-    flag = !flag;
-    std::cout << "flag = " << flag << std::endl;
+  // bool flag = false;
+  // while (std::cin.get()) {
+  //  flag = !flag;
+  //  std::cout << "flag = " << flag << std::endl;
 
-    if (flag) {
-      robot->setConfiguration(configuration);
-      robotGizmo->setConfiguration(configuration);
-    } else {
-      robot->setConfiguration(robotConfiguration);
-      robotGizmo->setConfiguration(robotConfiguration);
-    }
-  }
+  //  if (flag) {
+  //    robot->setConfiguration(configuration);
+  //    robotGizmo->setConfiguration(configuration);
+  //  } else {
+  //    robot->setConfiguration(robotConfiguration);
+  //    robotGizmo->setConfiguration(robotConfiguration);
+  //  }
+  //}
 
   return 0;
 }
@@ -244,3 +230,51 @@ const Eigen::Affine3d targetTransform = convertWorldToLocal(endEffectorTransform
   const std::vector<double> configuration{ theta1, theta2, theta3, theta4, theta5, theta6 };
   return configuration;
 */
+
+#include <thread>
+int debugVisualizer() {
+  auto visualizer = std::make_shared<kinverse::visualization::KinverseVisualizer>();
+
+  auto world = std::make_shared<kinverse::visualization::CoordinateFrameGizmo>();
+  world->setCaption("world");
+  visualizer->addGizmo(world);
+
+  auto gizmo = std::make_shared<kinverse::visualization::CoordinateFrameGizmo>();
+  {
+    Eigen::Affine3d transform;
+    transform = Eigen::Translation3d(2000.0, 0.0, 0.0);
+    gizmo->setTransform(transform);
+  }
+  visualizer->addGizmo(gizmo);
+
+  const auto getCurrentTime = []() -> long long {
+    return static_cast<long long>(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
+  };
+  auto updateGizmo = [&]() {
+    const auto startTime = getCurrentTime();
+    while (true) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+      const auto currentTime = getCurrentTime();
+      const auto secondsPassed = (currentTime - startTime) / 1000000.0;
+
+      const double angle = secondsPassed * (5.0 / 180.0) * M_PI;
+      const Eigen::Affine3d transform = Eigen::AngleAxisd(angle, Eigen::Vector3d::UnitZ()) * Eigen::Translation3d(2000.0, 0.0, 0.0);
+      std::cout << "before update" << std::endl;
+      // gizmo->setTransform(transform);
+      std::cout << "after update" << std::endl;
+      std::cout << std::endl << std::endl << std::endl << std::endl;
+
+      // gizmo->setAxesLength(100.0);
+      // gizmo->setAxesLabels({ "x", "y", "z" });
+      gizmo->setCaption("fuck");
+      // gizmo->setTransform(Eigen::Affine3d::Identity());
+    }
+  };
+  auto updateThread = std::thread(updateGizmo);
+
+  if (updateThread.joinable())
+    updateThread.join();
+
+  return 0;
+}

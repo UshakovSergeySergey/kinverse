@@ -88,13 +88,13 @@ namespace kinverse {
        * @brief This method adds all objects in the gizmo and its children to the rendering pipeline
        * @param[in] renderer - vtk renderer object (vtkSmartPointer<vtkRenderer>* is cast to void* in order to get rid of VTK dependency)
        */
-      virtual void show(void* renderer);
+      virtual void show(void* renderer = nullptr);
 
       /**
        * @brief This method removes all objects in the gizmo and its children from the rendering pipeline
        * @param[in] renderer - vtk renderer object (vtkSmartPointer<vtkRenderer>* is cast to void* in order to get rid of VTK dependency)
        */
-      virtual void hide(void* renderer);
+      virtual void hide(void* renderer = nullptr);
 
       /**
        * @brief Helper method that adds or removes gizmo to rendering pipeline.

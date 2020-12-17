@@ -114,6 +114,11 @@ void kinverse::visualization::CoordinateFrameGizmo::scaleLabels(double scale) co
 }
 
 void kinverse::visualization::CoordinateFrameGizmo::show(void* renderer) {
-  IGizmo::show(renderer);
   IGizmo::show(m_captionGizmo, renderer);
+  IGizmo::show(renderer);
+}
+
+void kinverse::visualization::CoordinateFrameGizmo::hide(void* renderer) {
+  IGizmo::hide(m_captionGizmo, renderer);
+  IGizmo::hide(renderer);
 }

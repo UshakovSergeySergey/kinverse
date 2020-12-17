@@ -30,41 +30,4 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
-
-#include "exports.h"
-#include "i_gizmo.h"
-#include "mesh_gizmo.h"
-#include "coordinate_frame_gizmo.h"
-#include <kinverse/core/robot.h>
-
-namespace kinverse {
-  namespace visualization {
-
-    class KINVERSE_VISUALIZATION_API RobotGizmo : public IGizmo {
-     public:
-      using Ptr = std::shared_ptr<RobotGizmo>;
-      using ConstPtr = std::shared_ptr<const RobotGizmo>;
-
-      explicit RobotGizmo(const IGizmo* parentGizmo = nullptr, core::Robot::ConstPtr robot = nullptr);
-
-      void setRobot(core::Robot::ConstPtr robot);
-      core::Robot::ConstPtr getRobot() const;
-
-      void updateRobotConfiguration();
-
-     protected:
-      void show(void* renderer = nullptr) override;
-      void hide(void* renderer = nullptr) override;
-
-     private:
-      void updateRobotStructure();
-
-      core::Robot::ConstPtr m_robot{ nullptr };
-      std::vector<core::Mesh::ConstPtr> m_meshes{};
-      std::vector<MeshGizmo::Ptr> m_meshGizmos{};
-      CoordinateFrameGizmo::Ptr m_endEffectorGizmo{ nullptr };
-    };
-
-  }  // namespace visualization
-}  // namespace kinverse
+#include "stdafx.h"

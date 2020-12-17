@@ -41,10 +41,12 @@ kinverse::visualization::IGizmo::IGizmo(const IGizmo* parentGizmo) {
 
 void kinverse::visualization::IGizmo::show(void* renderer) {
   addToRenderingPipeline(renderer, true);
+  render();
 }
 
 void kinverse::visualization::IGizmo::hide(void* renderer) {
   addToRenderingPipeline(renderer, false);
+  render();
 }
 
 void kinverse::visualization::IGizmo::addToRenderingPipeline(void* renderer_, bool addToPipeline) const {

@@ -56,6 +56,12 @@
     <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\joint_gizmo.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\kinematic_diagram_gizmo.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\link_gizmo.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\visualization\implementation\coordinate_frame_gizmo.cpp">
@@ -95,6 +101,12 @@
       <Filter>implementation</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\visualization\implementation\joint_gizmo.cpp">
+      <Filter>implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\visualization\implementation\kinematic_diagram_gizmo.cpp">
+      <Filter>implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\visualization\implementation\link_gizmo.cpp">
       <Filter>implementation</Filter>
     </ClCompile>
   </ItemGroup>

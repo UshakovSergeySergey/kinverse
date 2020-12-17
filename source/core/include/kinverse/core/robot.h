@@ -38,10 +38,8 @@ namespace kinverse {
       void setTransform(const Eigen::Affine3d& transform);
       Eigen::Affine3d getTransform() const;
 
-
-
-
-
+      void setMeshes(const std::vector<Mesh::ConstPtr>& meshes);
+      std::vector<Mesh::ConstPtr> getMeshes() const;
 
       unsigned int getNumberOfJoints() const;
       unsigned int getNumberOfLinks() const;
@@ -61,6 +59,7 @@ namespace kinverse {
       std::vector<DenavitHartenbergParameters> m_dhTable{};
       std::vector<JointConstraints> m_constraints{};
       std::vector<double> m_configuration{};
+      std::vector<Mesh::ConstPtr> m_meshes{};
     };
 
   }  // namespace core

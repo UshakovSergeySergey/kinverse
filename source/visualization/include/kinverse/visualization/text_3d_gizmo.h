@@ -150,6 +150,14 @@ namespace kinverse {
        */
       void show(void* renderer) override;
 
+      /**
+       * @brief In order to implement faceTowardsCamera and viewportConstScale functionality
+       * Text3DGizmo needs subscription for camera events.
+       * Here we are overriding default @p hide method in order to make unsubscription.
+       * @param[in] renderer - vtk renderer object (vtkSmartPointer<vtkRenderer>* is cast to void* in order to get rid of VTK dependency)
+       */
+      void hide(void* renderer) override;
+
      private:
       /**
        * @brief This is a helper method that updates subscription for camera events.

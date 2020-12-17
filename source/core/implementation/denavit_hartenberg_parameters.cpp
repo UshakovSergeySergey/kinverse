@@ -33,8 +33,13 @@
 #include "stdafx.h"
 #include "../include/kinverse/core/denavit_hartenberg_parameters.h"
 
-kinverse::core::DenavitHartenbergParameters::DenavitHartenbergParameters(JointType jointType, double d, double theta, double r, double alpha) :
-    m_jointType{ jointType }, m_d{ d }, m_theta{ theta }, m_r{ r }, m_alpha{ alpha } {
+kinverse::core::DenavitHartenbergParameters::DenavitHartenbergParameters(
+    JointType jointType, double zAxisDisplacement, double zAxisRotation, double xAxisDisplacement, double xAxisRotation) {
+  setJointType(jointType);
+  setZAxisDisplacement(zAxisDisplacement);
+  setZAxisRotation(zAxisRotation);
+  setXAxisDisplacement(xAxisDisplacement);
+  setXAxisRotation(xAxisRotation);
 }
 
 void kinverse::core::DenavitHartenbergParameters::setJointType(JointType jointType) {
@@ -45,7 +50,43 @@ kinverse::core::JointType kinverse::core::DenavitHartenbergParameters::getJointT
   return m_jointType;
 }
 
+void kinverse::core::DenavitHartenbergParameters::setZAxisDisplacement(double displacement) {
+  m_zAxisDisplacement = displacement;
+}
+
+double kinverse::core::DenavitHartenbergParameters::getZAxisDisplacement() const {
+  return m_zAxisDisplacement;
+}
+
+void kinverse::core::DenavitHartenbergParameters::setZAxisRotation(double angle) {
+  m_zAxisRotation = angle;
+}
+
+double kinverse::core::DenavitHartenbergParameters::getZAxisRotation() const {
+  return m_zAxisRotation;
+}
+
+void kinverse::core::DenavitHartenbergParameters::setXAxisDisplacement(double displacement) {
+  m_xAxisDisplacement = displacement;
+}
+
+double kinverse::core::DenavitHartenbergParameters::getXAxisDisplacement() const {
+  return m_xAxisDisplacement;
+}
+
+void kinverse::core::DenavitHartenbergParameters::setXAxisRotation(double angle) {
+  m_xAxisRotation = angle;
+}
+
+double kinverse::core::DenavitHartenbergParameters::getXAxisRotation() const {
+  return m_xAxisRotation;
+}
+
 Eigen::Affine3d kinverse::core::DenavitHartenbergParameters::getTransform(double value) const {
+  return getTransformZ(value) * getTransformX();
+}
+
+Eigen::Affine3d kinverse::core::DenavitHartenbergParameters::getTransformZ(double value) const {
   double angle = 0.0;
   double displacement = 0.0;
 
@@ -55,7 +96,12 @@ Eigen::Affine3d kinverse::core::DenavitHartenbergParameters::getTransform(double
   if (m_jointType == JointType::Prismatic)
     displacement = value;
 
-  const Eigen::Affine3d transform = Eigen::Translation3d(0.0, 0.0, m_d + displacement) * Eigen::AngleAxisd(m_theta + angle, Eigen::Vector3d::UnitZ()) *
-                                    Eigen::Translation3d(m_r, 0.0, 0.0) * Eigen::AngleAxisd(m_alpha, Eigen::Vector3d::UnitX());
+  const Eigen::Affine3d transform =
+      Eigen::Translation3d(0.0, 0.0, m_zAxisDisplacement + displacement) * Eigen::AngleAxisd(m_zAxisRotation + angle, Eigen::Vector3d::UnitZ());
+  return transform;
+}
+
+Eigen::Affine3d kinverse::core::DenavitHartenbergParameters::getTransformX() const {
+  const Eigen::Affine3d transform = Eigen::Translation3d(m_xAxisDisplacement, 0.0, 0.0) * Eigen::AngleAxisd(m_xAxisRotation, Eigen::Vector3d::UnitX());
   return transform;
 }

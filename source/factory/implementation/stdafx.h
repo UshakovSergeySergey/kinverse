@@ -32,39 +32,18 @@
 
 #pragma once
 
-#include "exports.h"
-#include "i_gizmo.h"
-#include "mesh_gizmo.h"
-#include "coordinate_frame_gizmo.h"
-#include <kinverse/core/robot.h>
+#pragma warning(disable : 4251)  // Warning C4251 class needs to have dll - interface to be used by clients of class
+#pragma warning(disable : 4275)  // Warning C4275 non dll - interface class used as base for dll - interface class
 
-namespace kinverse {
-  namespace visualization {
+#pragma warning(push)
 
-    class KINVERSE_VISUALIZATION_API RobotGizmo : public IGizmo {
-     public:
-      using Ptr = std::shared_ptr<RobotGizmo>;
-      using ConstPtr = std::shared_ptr<const RobotGizmo>;
+#define _USE_MATH_DEFINES
+#include <cmath>
 
-      explicit RobotGizmo(const IGizmo* parentGizmo = nullptr, core::Robot::ConstPtr robot = nullptr);
+#include <memory>
+#include <vector>
+#include <string>
 
-      void setRobot(core::Robot::ConstPtr robot);
-      core::Robot::ConstPtr getRobot() const;
+#include <Eigen/Geometry>
 
-      void updateRobotConfiguration();
-
-     protected:
-      void show(void* renderer = nullptr) override;
-      void hide(void* renderer = nullptr) override;
-
-     private:
-      void updateRobotStructure();
-
-      core::Robot::ConstPtr m_robot{ nullptr };
-      std::vector<core::Mesh::ConstPtr> m_meshes{};
-      std::vector<MeshGizmo::Ptr> m_meshGizmos{};
-      CoordinateFrameGizmo::Ptr m_endEffectorGizmo{ nullptr };
-    };
-
-  }  // namespace visualization
-}  // namespace kinverse
+#pragma warning(pop)

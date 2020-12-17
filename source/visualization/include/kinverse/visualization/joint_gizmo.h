@@ -76,7 +76,7 @@ namespace kinverse {
       void setTransform(const Eigen::Affine3d& transform);
 
       /**
-       * @brief Returns transform of the revolute joint.
+       * @brief Returns transform of the joint.
        */
       Eigen::Affine3d getTransform() const;
 
@@ -109,6 +109,13 @@ namespace kinverse {
        * @param[in] renderer - vtk renderer object (vtkSmartPointer<vtkRenderer>* is cast to void* in order to get rid of VTK dependency)
        */
       void show(void* renderer) override;
+
+      /**
+       * @brief JointGizmo is compound gizmo, so we need to override default @p hide method.
+       * This method simply tells how to hide this complex gizmo.
+       * @param[in] renderer - vtk renderer object (vtkSmartPointer<vtkRenderer>* is cast to void* in order to get rid of VTK dependency)
+       */
+      void hide(void* renderer) override;
 
      private:
       /**

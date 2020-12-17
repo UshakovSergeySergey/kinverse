@@ -122,6 +122,13 @@ namespace kinverse {
        */
       void show(void* renderer) override;
 
+      /**
+       * @brief As soon as this is a compound gizmo, we need to override default @p hide method.
+       * This method simply tells how to hide this complex gizmo.
+       * @param[in] renderer - vtk renderer object (vtkSmartPointer<vtkRenderer>* is cast to void* in order to get rid of VTK dependency)
+       */
+      void hide(void* renderer) override;
+
      private:
       /**
        * @brief This is a helper method. It updates geometry transform each time axes length or coordinate frame transform changes.

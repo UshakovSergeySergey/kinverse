@@ -49,12 +49,16 @@ namespace kinverse {
       /**
        * @brief Simple constructor.
        * @param[in] jointType - type of joint
-       * @param[in] d - displacement along the previous joint's Z axis
-       * @param[in] theta - angle in radians about the previous joint's Z axis
-       * @param[in] r - displacement along the rotated X axis
-       * @param[in] alpha - angle in radians about the rotated X axis
+       * @param[in] zAxisDisplacement - displacement along the previous joint's Z axis (also known as D parameter)
+       * @param[in] zAxisRotation - angle in radians about the previous joint's Z axis (also known as Theta parameter)
+       * @param[in] xAxisDisplacement - displacement along the rotated X axis (also known as R parameter)
+       * @param[in] xAxisRotation - angle in radians about the rotated X axis (also known as Alpha parameter)
        */
-      DenavitHartenbergParameters(JointType jointType, double d, double theta, double r, double alpha);
+      DenavitHartenbergParameters(JointType jointType = JointType::Revolute,
+                                  double zAxisDisplacement = 0.0,
+                                  double zAxisRotation = 0.0,
+                                  double xAxisDisplacement = 0.0,
+                                  double xAxisRotation = 0.0);
 
       /**
        * @brief This method sets the joint type described with these DH parameters
@@ -68,6 +72,50 @@ namespace kinverse {
       JointType getJointType() const;
 
       /**
+       * @brief Sets displacement along the previous joint's Z axis (also known as D parameter)
+       * @param[in] displacement - displacement
+       */
+      void setZAxisDisplacement(double displacement);
+
+      /**
+       * @brief Returns displacement along the previous joint's Z axis (also known as D parameter)
+       */
+      double getZAxisDisplacement() const;
+
+      /**
+       * @brief Sets angle in radians about the previous joint's Z axis (also known as Theta parameter)
+       * @param[in] angle - angle
+       */
+      void setZAxisRotation(double angle);
+
+      /**
+       * @brief Returns angle in radians about the previous joint's Z axis (also known as Theta parameter)
+       */
+      double getZAxisRotation() const;
+
+      /**
+       * @brief Sets displacement along the rotated X axis (also known as R parameter)
+       * @param[in] displacement - displacement
+       */
+      void setXAxisDisplacement(double displacement);
+
+      /**
+       * @brief Returns displacement along the rotated X axis (also known as R parameter)
+       */
+      double getXAxisDisplacement() const;
+
+      /**
+       * @brief Sets angle in radians about the rotated X axis (also known as Alpha parameter)
+       * @param[in] angle - angle
+       */
+      void setXAxisRotation(double angle);
+
+      /**
+       * @brief Returns angle in radians about the rotated X axis (also known as Alpha parameter)
+       */
+      double getXAxisRotation() const;
+
+      /**
        * @brief Returns Denavit-Hartenberg transform from the previous joint's coordinate frame to the current joint coordinate frame.
        * Transform is parameterized with angle/distance depending on the joint type.
        * For example, if you want to get transform of the revolute joint coordinate frame when axis angle equals Pi, just pass this angle as parameter.
@@ -77,6 +125,22 @@ namespace kinverse {
        */
       Eigen::Affine3d getTransform(double value = 0.0) const;
 
+      /**
+       * @brief Transform from the previous joint's coordinate frame to the current joint coordinate frame consists of two parts:
+       * rotation and translation along Z axis, rotation and translation along X axis.
+       * This method returns Z part of transform.
+       * @param[in] value - joint axis value. If joint type is Prismatic, then it represents displacement along Z axis. If joint type is Revolute, then it
+       * represents angle in radians about Z axis.
+       */
+      Eigen::Affine3d getTransformZ(double value = 0.0) const;
+
+      /**
+       * @brief Transform from the previous joint's coordinate frame to the current joint coordinate frame consists of two parts:
+       * rotation and translation along Z axis, rotation and translation along X axis.
+       * This method returns X part of transform.
+       */
+      Eigen::Affine3d getTransformX() const;
+
      private:
       /**
        * @brief Stores type of joint described by Denavit-Hartenberg parameters.
@@ -84,24 +148,24 @@ namespace kinverse {
       JointType m_jointType{ JointType::Revolute };
 
       /**
-       * @brief Stores displacement along the previous joint's Z axis
+       * @brief Stores displacement along the previous joint's Z axis (also known as D parameter)
        */
-      double m_d{ 0.0 };
+      double m_zAxisDisplacement{ 0.0 };
 
       /**
-       * @brief Stores angle in radians about the previous joint's Z axis
+       * @brief Stores angle in radians about the previous joint's Z axis (also known as Theta parameter)
        */
-      double m_theta{ 0.0 };
+      double m_zAxisRotation{ 0.0 };
 
       /**
-       * @brief Stores displacement along the rotated X axis
+       * @brief Stores displacement along the rotated X axis (also known as R parameter)
        */
-      double m_r{ 0.0 };
+      double m_xAxisDisplacement{ 0.0 };
 
       /**
-       * @brief Stores angle in radians about the rotated X axis
+       * @brief Stores angle in radians about the rotated X axis (also known as Alpha parameter)
        */
-      double m_alpha{ 0.0 };
+      double m_xAxisRotation{ 0.0 };
     };
 
   }  // namespace core

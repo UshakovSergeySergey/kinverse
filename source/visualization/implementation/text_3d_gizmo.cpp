@@ -121,6 +121,11 @@ void kinverse::visualization::Text3DGizmo::show(void* renderer) {
   updateSubscriptionForCameraEvents();
 }
 
+void kinverse::visualization::Text3DGizmo::hide(void* renderer) {
+  IGizmo::hide(renderer);
+  //@todo we need to unsubscribe here
+}
+
 void kinverse::visualization::Text3DGizmo::updateSubscriptionForCameraEvents() {
   if (!m_pImpl || !m_pImpl->getRenderer())
     return;

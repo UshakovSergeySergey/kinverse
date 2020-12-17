@@ -41,7 +41,7 @@ kinverse::visualization::JointGizmo::JointGizmo(const IGizmo* parentGizmo,
                                                 unsigned int jointIndex) :
     IGizmo{ parentGizmo } {
   m_coordinateFrame = std::make_shared<CoordinateFrameGizmo>(this);
-  m_coordinateFrame->setAxesLength(250.0);
+  m_coordinateFrame->setAxesLength(100.0);
   m_jointMesh = std::make_shared<CylinderGizmo>(this);
 
   setJointType(jointType);
@@ -50,9 +50,15 @@ kinverse::visualization::JointGizmo::JointGizmo(const IGizmo* parentGizmo,
 }
 
 void kinverse::visualization::JointGizmo::show(void* renderer) {
-  IGizmo::show(renderer);
   IGizmo::show(m_coordinateFrame, renderer);
   IGizmo::show(m_jointMesh, renderer);
+  IGizmo::show(renderer);
+}
+
+void kinverse::visualization::JointGizmo::hide(void* renderer) {
+  IGizmo::hide(m_coordinateFrame, renderer);
+  IGizmo::hide(m_jointMesh, renderer);
+  IGizmo::hide(renderer);
 }
 
 void kinverse::visualization::JointGizmo::setJointType(core::JointType jointType) {

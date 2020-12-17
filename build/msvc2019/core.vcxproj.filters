@@ -32,9 +32,6 @@
     <ClInclude Include="..\..\source\core\include\kinverse\core\robot.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\core\include\kinverse\core\robot_factory.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\core\include\kinverse\core\robot_type.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -56,9 +53,6 @@
       <Filter>implementation</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\core\implementation\robot.cpp">
-      <Filter>implementation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\core\implementation\robot_factory.cpp">
       <Filter>implementation</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\core\implementation\stdafx.cpp">

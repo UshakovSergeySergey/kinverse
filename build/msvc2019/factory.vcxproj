@@ -13,8 +13,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{e24675be-bde0-4457-90b6-1b26d9eacc0e}</ProjectGuid>
-    <RootNamespace>core</RootNamespace>
+    <ProjectGuid>{0e8c7bd3-70ba-4b56-8f4b-84e620adb36c}</ProjectGuid>
+    <RootNamespace>factory</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -59,11 +59,11 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_SILENCE_CXX17_NEGATORS_DEPRECATION_WARNING;EXPORT_KINVERSE_CORE;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SILENCE_CXX17_NEGATORS_DEPRECATION_WARNING;EXPORT_KINVERSE_FACTORY;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/eigen-3.3.4/;$(SolutionDir)/../../source/math/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeader>Use</PrecompiledHeader>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/eigen-3.3.4/;$(SolutionDir)/../../source/io/include/;$(SolutionDir)/../../source/math/include/;$(SolutionDir)/../../source/core/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -76,11 +76,11 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_SILENCE_CXX17_NEGATORS_DEPRECATION_WARNING;EXPORT_KINVERSE_CORE;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SILENCE_CXX17_NEGATORS_DEPRECATION_WARNING;EXPORT_KINVERSE_FACTORY;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/eigen-3.3.4/;$(SolutionDir)/../../source/math/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeader>Use</PrecompiledHeader>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/eigen-3.3.4/;$(SolutionDir)/../../source/io/include/;$(SolutionDir)/../../source/math/include/;$(SolutionDir)/../../source/core/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -90,31 +90,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="math.vcxproj">
-      <Project>{a73fa341-250c-43d5-8203-e9a649841f5d}</Project>
-    </ProjectReference>
+    <ClInclude Include="..\..\source\factory\implementation\stdafx.h" />
+    <ClInclude Include="..\..\source\factory\include\kinverse\factory\exports.h" />
+    <ClInclude Include="..\..\source\factory\include\kinverse\factory\robot_factory.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\core\implementation\stdafx.h" />
-    <ClInclude Include="..\..\source\core\include\kinverse\core\analytical_solver.h" />
-    <ClInclude Include="..\..\source\core\include\kinverse\core\denavit_hartenberg_parameters.h" />
-    <ClInclude Include="..\..\source\core\include\kinverse\core\exports.h" />
-    <ClInclude Include="..\..\source\core\include\kinverse\core\joint_constraints.h" />
-    <ClInclude Include="..\..\source\core\include\kinverse\core\joint_type.h" />
-    <ClInclude Include="..\..\source\core\include\kinverse\core\mesh.h" />
-    <ClInclude Include="..\..\source\core\include\kinverse\core\robot.h" />
-    <ClInclude Include="..\..\source\core\include\kinverse\core\robot_type.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\source\core\implementation\analytical_solver.cpp" />
-    <ClCompile Include="..\..\source\core\implementation\denavit_hartenberg_parameters.cpp" />
-    <ClCompile Include="..\..\source\core\implementation\joint_constraints.cpp" />
-    <ClCompile Include="..\..\source\core\implementation\mesh.cpp" />
-    <ClCompile Include="..\..\source\core\implementation\robot.cpp" />
-    <ClCompile Include="..\..\source\core\implementation\stdafx.cpp">
+    <ClCompile Include="..\..\source\factory\implementation\robot_factory.cpp" />
+    <ClCompile Include="..\..\source\factory\implementation\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="core.vcxproj">
+      <Project>{e24675be-bde0-4457-90b6-1b26d9eacc0e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="io.vcxproj">
+      <Project>{ab876d62-6e9c-44fa-9d86-78ce02fb0ebf}</Project>
+    </ProjectReference>
+    <ProjectReference Include="math.vcxproj">
+      <Project>{a73fa341-250c-43d5-8203-e9a649841f5d}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

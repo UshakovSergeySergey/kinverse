@@ -61,7 +61,7 @@
       <PreprocessorDefinitions>_SILENCE_CXX17_NEGATORS_DEPRECATION_WARNING;EXPORT_KINVERSE_VISUALIZATION;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/eigen-3.3.4/;$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/vtk-8.1.0/include/vtk-8.1/;$(SolutionDir)/../../source/core/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/eigen-3.3.4/;$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/vtk-8.1.0/include/vtk-8.1/;$(SolutionDir)/../../source/math/include/;$(SolutionDir)/../../source/core/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -80,7 +80,7 @@
       <PreprocessorDefinitions>_SILENCE_CXX17_NEGATORS_DEPRECATION_WARNING;EXPORT_KINVERSE_VISUALIZATION;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/eigen-3.3.4/;$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/vtk-8.1.0/include/vtk-8.1/;$(SolutionDir)/../../source/core/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/eigen-3.3.4/;$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/vtk-8.1.0/include/vtk-8.1/;$(SolutionDir)/../../source/math/include/;$(SolutionDir)/../../source/core/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -96,6 +96,9 @@
     <ProjectReference Include="core.vcxproj">
       <Project>{e24675be-bde0-4457-90b6-1b26d9eacc0e}</Project>
     </ProjectReference>
+    <ProjectReference Include="math.vcxproj">
+      <Project>{a73fa341-250c-43d5-8203-e9a649841f5d}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\visualization\implementation\i_gizmo_impl.h" />
@@ -108,7 +111,9 @@
     <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\cylinder_gizmo.h" />
     <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\exports.h" />
     <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\i_gizmo.h" />
+    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\kinematic_diagram_gizmo.h" />
     <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\kinverse_visualizer.h" />
+    <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\link_gizmo.h" />
     <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\mesh_gizmo.h" />
     <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\joint_gizmo.h" />
     <ClInclude Include="..\..\source\visualization\include\kinverse\visualization\robot_gizmo.h" />
@@ -120,7 +125,9 @@
     <ClCompile Include="..\..\source\visualization\implementation\cylinder_gizmo.cpp" />
     <ClCompile Include="..\..\source\visualization\implementation\i_gizmo.cpp" />
     <ClCompile Include="..\..\source\visualization\implementation\i_gizmo_impl.cpp" />
+    <ClCompile Include="..\..\source\visualization\implementation\kinematic_diagram_gizmo.cpp" />
     <ClCompile Include="..\..\source\visualization\implementation\kinverse_visualizer.cpp" />
+    <ClCompile Include="..\..\source\visualization\implementation\link_gizmo.cpp" />
     <ClCompile Include="..\..\source\visualization\implementation\mesh_gizmo.cpp" />
     <ClCompile Include="..\..\source\visualization\implementation\mesh_to_vtk_poly_data_converter.cpp" />
     <ClCompile Include="..\..\source\visualization\implementation\joint_gizmo.cpp" />

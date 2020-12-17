@@ -65,8 +65,8 @@ namespace kinverse {
        */
       explicit CylinderGizmo(const IGizmo* parentGizmo = nullptr,
                              const Eigen::Affine3d& transform = Eigen::Affine3d::Identity(),
-                             double radius = 37.5,
-                             double height = 150.0,
+                             double radius = 31.25,
+                             double height = 125.0,
                              const Color& color = { 255, 255, 255, 255 });
 
       /**
@@ -132,12 +132,12 @@ namespace kinverse {
       /**
        * @brief Stores cylinders radius.
        */
-      double m_radius{ 37.5 };
+      double m_radius{ 31.25 };
 
       /**
        * @brief Stores cylinders height.
        */
-      double m_height{ 150.0 };
+      double m_height{ 125.0 };
     };
 
   }  // namespace visualization
