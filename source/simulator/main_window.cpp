@@ -9,6 +9,7 @@ kinverse::simulator::MainWindow::MainWindow(QWidget* parent) : QMainWindow{ pare
 
   initializeVisualizer();
   initializeRobot();
+  initializeIKSolver();
   initializeGizmos();
   initializeProgressIcon();
 
@@ -28,7 +29,11 @@ kinverse::simulator::MainWindow::MainWindow(QWidget* parent) : QMainWindow{ pare
   QObject::connect(m_ui.pushButton_solveInverseKinematics, &QPushButton::pressed, this, &MainWindow::onFindAnalyticalSolution);
 
   // update list of IK solutions
+  qRegisterMetaType<std::vector<std::vector<double>>>("std::vector<std::vector<double>>");
   QObject::connect(this, &MainWindow::solvedIKSignal, this, &MainWindow::onAnalyticalSolutionFound);
+
+  // select solution
+  QObject::connect(m_ui.tableWidget_ikSolutions->selectionModel(), &QItemSelectionModel::selectionChanged, this, &MainWindow::onSolutionSelected);
 
   onAxisValueChanged();
   onRobotAppearanceChanged();
@@ -50,6 +55,10 @@ void kinverse::simulator::MainWindow::initializeRobot() {
 
   const std::vector<double> configuration{ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
   m_robot->setConfiguration(configuration);
+}
+
+void kinverse::simulator::MainWindow::initializeIKSolver() {
+  m_ikSolver = std::make_shared<core::AnalyticalSolver>(m_robot);
 }
 
 void kinverse::simulator::MainWindow::initializeGizmos() {
@@ -106,10 +115,33 @@ void kinverse::simulator::MainWindow::onFindAnalyticalSolution() {
   m_thread = std::thread(&MainWindow::solveIK, this);
 }
 
-void kinverse::simulator::MainWindow::onAnalyticalSolutionFound() {
+void kinverse::simulator::MainWindow::onAnalyticalSolutionFound(const std::vector<std::vector<double>>& solutions) {
   if (m_thread.joinable())
     m_thread.join();
+  updateListOfIKSolutionsGui(solutions);
   enableGui(true);
+}
+
+void kinverse::simulator::MainWindow::onSolutionSelected(const QItemSelection& selected, const QItemSelection&) {
+  if (selected.indexes().empty())
+    return;
+
+  const auto selectedSolutionIndex = selected.indexes().front().row();
+  const auto numberOfJoints = m_robot->getNumberOfJoints();
+
+  std::vector<double> configuration(numberOfJoints, 0.0);
+  for (auto jointCounter = 0u; jointCounter < numberOfJoints; ++jointCounter) {
+    const auto item = m_ui.tableWidget_ikSolutions->item(selectedSolutionIndex, jointCounter);
+    const auto str = item->text().toStdString();
+    const double jointValue = math::degreesToRadians(std::stod(str));
+    configuration[jointCounter] = jointValue;
+  }
+
+  updateAxesValuesGui(configuration);
+
+  m_robot->setConfiguration(configuration);
+  m_robotGizmo->updateRobotConfiguration();
+  m_kinematicDiagramGizmo->updateRobotConfiguration();
 }
 
 void kinverse::simulator::MainWindow::enableGui(bool enabled) const {
@@ -154,6 +186,51 @@ void kinverse::simulator::MainWindow::updateAxesValuesGui(const std::vector<doub
   m_ui.doubleSpinBox_A6->setValue(math::radiansToDegrees(configuration[5]));
 }
 
+void kinverse::simulator::MainWindow::updateListOfIKSolutionsGui(const std::vector<std::vector<double>>& solutions) const {
+  const auto numberOfSolutions = solutions.size();
+  const auto numberOfJoints = m_robot->getNumberOfJoints();
+
+  // update solution table
+  m_ui.tableWidget_ikSolutions->clear();
+  m_ui.tableWidget_ikSolutions->setRowCount(numberOfSolutions);
+  m_ui.tableWidget_ikSolutions->setColumnCount(numberOfJoints);
+
+  for (auto solutionCounter = 0u; solutionCounter < numberOfSolutions; ++solutionCounter) {
+    for (auto jointCounter = 0u; jointCounter < numberOfJoints; ++jointCounter) {
+      const double jointValue = math::radiansToDegrees(solutions[solutionCounter][jointCounter]);
+      m_ui.tableWidget_ikSolutions->setItem(solutionCounter, jointCounter, new QTableWidgetItem(std::to_string(jointValue).c_str()));
+    }
+  }
+
+  // select current solution
+  const auto computeDistance = [](const std::vector<double>& conf1, const std::vector<double>& conf2) -> double {
+    Eigen::VectorXd c1(conf1.size());
+    for (int i = 0; i < conf1.size(); i++) {
+      c1(i) = conf1[i];
+    }
+
+    Eigen::VectorXd c2(conf2.size());
+    for (int i = 0; i < conf2.size(); i++) {
+      c2(i) = conf2[i];
+    }
+
+    return (c1 - c2).norm();
+  };
+
+  double minDistance = std::numeric_limits<double>::max();
+  int currentConfigurationIndex = -1;
+  const auto currentConfiguration = m_robot->getConfiguration();
+  for (auto solutionCounter = 0u; solutionCounter < numberOfSolutions; ++solutionCounter) {
+    const double currentDistance = computeDistance(currentConfiguration, solutions[solutionCounter]);
+    if (currentDistance < minDistance) {
+      minDistance = currentDistance;
+      currentConfigurationIndex = solutionCounter;
+    }
+  }
+
+  m_ui.tableWidget_ikSolutions->selectRow(currentConfigurationIndex);
+}
+
 bool kinverse::simulator::MainWindow::configurationViolatesConstraints(const std::vector<double>& configuration) const {
   bool violatesConstraints = false;
 
@@ -166,9 +243,18 @@ bool kinverse::simulator::MainWindow::configurationViolatesConstraints(const std
 }
 
 void kinverse::simulator::MainWindow::solveIK() {
-  std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+  Eigen::Affine3d endEffectorTransform = m_robot->getLinkCoordinateFrames().back();
+  const auto solutionFromSolver = m_ikSolver->solveUnrefactored(endEffectorTransform);
 
-  emit solvedIKSignal();
+  const auto currentRobotConfiguration = m_robot->getConfiguration();
+  const std::vector<std::vector<double>> solutions{
+    solutionFromSolver,                      //
+    { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },        //
+    currentRobotConfiguration,               //
+    { 0.0, -M_PI_2, M_PI_2, 0.0, 0.0, 0.0 }  //
+  };
+
+  emit solvedIKSignal(solutions);
 }
 
 ///////////////////////////////////////////////////////////////
