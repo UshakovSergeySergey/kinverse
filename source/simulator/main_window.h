@@ -13,7 +13,7 @@ namespace kinverse {
       Q_OBJECT
 
      signals:
-      void ggg();
+      void solvedIKSignal();
 
      public:
       explicit MainWindow(QWidget* parent = Q_NULLPTR);
@@ -23,10 +23,14 @@ namespace kinverse {
       void initializeVisualizer();
       void initializeRobot();
       void initializeGizmos();
+      void initializeProgressIcon();
 
       void onAxisValueChanged() const;
       void onRobotAppearanceChanged();
+      void onFindAnalyticalSolution();
+      void onAnalyticalSolutionFound();
 
+      void enableGui(bool enabled) const;
       std::vector<double> extractRobotConfigurationFromGui() const;
       bool configurationViolatesConstraints(const std::vector<double>& configuration) const;
       void updateAxesValuesGui(const std::vector<double>& configuration) const;
@@ -40,6 +44,7 @@ namespace kinverse {
       visualization::KinematicDiagramGizmo::Ptr m_kinematicDiagramGizmo{ nullptr };
       core::Robot::Ptr m_robot{ nullptr };
       bool m_showKinematicDiagram{ true };
+      std::thread m_thread{};
     };
 
   }  // namespace simulator

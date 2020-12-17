@@ -19,7 +19,7 @@
      <widget class="QVTKOpenGLWidget" name="vtkWidget" native="true"/>
     </item>
     <item>
-     <widget class="QWidget" name="widget_2" native="true">
+     <widget class="QWidget" name="widget_guiControls" native="true">
       <property name="maximumSize">
        <size>
         <width>350</width>
@@ -361,6 +361,50 @@
           </item>
          </layout>
         </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_solveInverseKinematics">
+         <property name="toolTip">
+          <string>Solves inverse kinematics task analytically for current end effector position</string>
+         </property>
+         <property name="whatsThis">
+          <string/>
+         </property>
+         <property name="text">
+          <string>Solve IK analytically</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="widget_2" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <item>
+           <widget class="QLabel" name="label_progressIcon">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>50</width>
+              <height>50</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>50</width>
+              <height>50</height>
+             </size>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTableWidget" name="tableWidget"/>
        </item>
        <item>
         <spacer name="verticalSpacer">

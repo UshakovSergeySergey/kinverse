@@ -39,6 +39,9 @@
       <Project>{77db57f9-366d-4709-8b91-7a251e50763e}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="..\..\source\simulator\resources\resources.qrc" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{7C55B24C-D9A0-4800-8D92-16E8A1F74BF6}</ProjectGuid>
     <Keyword>QtVS_v303</Keyword>

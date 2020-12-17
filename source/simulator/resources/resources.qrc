@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/simulator-resources">
+        <file alias="loading-icon">loading-icon.gif</file>
+    </qresource>
+</RCC>

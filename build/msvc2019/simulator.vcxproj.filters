@@ -50,4 +50,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="..\..\source\simulator\resources\resources.qrc">
+      <Filter>Resource Files</Filter>
+    </QtRcc>
+  </ItemGroup>
 </Project>

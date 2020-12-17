@@ -10,6 +10,7 @@ kinverse::simulator::MainWindow::MainWindow(QWidget* parent) : QMainWindow{ pare
   initializeVisualizer();
   initializeRobot();
   initializeGizmos();
+  initializeProgressIcon();
 
   // change robot appearance
   QObject::connect(m_ui.radioButton_showRobot, &QRadioButton::toggled, this, &MainWindow::onRobotAppearanceChanged);
@@ -23,8 +24,15 @@ kinverse::simulator::MainWindow::MainWindow(QWidget* parent) : QMainWindow{ pare
   QObject::connect(m_ui.doubleSpinBox_A5, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::onAxisValueChanged);
   QObject::connect(m_ui.doubleSpinBox_A6, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::onAxisValueChanged);
 
+  // solve IK analytically
+  QObject::connect(m_ui.pushButton_solveInverseKinematics, &QPushButton::pressed, this, &MainWindow::onFindAnalyticalSolution);
+
+  // update list of IK solutions
+  QObject::connect(this, &MainWindow::solvedIKSignal, this, &MainWindow::onAnalyticalSolutionFound);
+
   onAxisValueChanged();
   onRobotAppearanceChanged();
+  onFindAnalyticalSolution();
 }
 
 void kinverse::simulator::MainWindow::initializeVisualizer() {
@@ -55,6 +63,17 @@ void kinverse::simulator::MainWindow::initializeGizmos() {
   m_kinverseVisualizer->addGizmo(m_robotGizmo);
 }
 
+void kinverse::simulator::MainWindow::initializeProgressIcon() {
+  QMovie* movie = new QMovie(":/simulator-resources/loading-icon");
+  if (movie->isValid()) {
+    movie->setScaledSize(m_ui.label_progressIcon->size());
+    m_ui.label_progressIcon->setMovie(movie);
+    movie->start();
+  } else {
+    m_ui.label_progressIcon->setText("Processing...");
+  }
+}
+
 void kinverse::simulator::MainWindow::onAxisValueChanged() const {
   const std::vector<double> configuration = extractRobotConfigurationFromGui();
 
@@ -79,6 +98,26 @@ void kinverse::simulator::MainWindow::onRobotAppearanceChanged() {
   } else {
     m_kinverseVisualizer->removeGizmo(m_kinematicDiagramGizmo);
     m_kinverseVisualizer->addGizmo(m_robotGizmo);
+  }
+}
+
+void kinverse::simulator::MainWindow::onFindAnalyticalSolution() {
+  enableGui(false);
+  m_thread = std::thread(&MainWindow::solveIK, this);
+}
+
+void kinverse::simulator::MainWindow::onAnalyticalSolutionFound() {
+  if (m_thread.joinable())
+    m_thread.join();
+  enableGui(true);
+}
+
+void kinverse::simulator::MainWindow::enableGui(bool enabled) const {
+  m_ui.widget_guiControls->setEnabled(enabled);
+  if (enabled) {
+    m_ui.label_progressIcon->hide();
+  } else {
+    m_ui.label_progressIcon->show();
   }
 }
 
@@ -126,10 +165,16 @@ bool kinverse::simulator::MainWindow::configurationViolatesConstraints(const std
   return violatesConstraints;
 }
 
-///////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////
+void kinverse::simulator::MainWindow::solveIK() {
+  std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 
+  emit solvedIKSignal();
+}
+
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+/*
 void kinverse::simulator::MainWindow::solveIK() {
   const auto getEndEffectorPosition = [this]() -> Eigen::VectorXd {
     const Eigen::Affine3d transform = m_robot->getLinkCoordinateFrames().back();
@@ -228,3 +273,4 @@ void kinverse::simulator::MainWindow::solveIK() {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 }
+*/

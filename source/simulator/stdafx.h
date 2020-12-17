@@ -22,5 +22,6 @@ VTK_MODULE_INIT(vtkInteractionStyle)
 
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMainWindow>
+#include <QMovie>
 
 #pragma warning(pop)
