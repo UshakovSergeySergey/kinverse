@@ -10,7 +10,7 @@ std::vector<double> kinverse::core::AnalyticalSolver::solveUnrefactored(const Ei
   //(facing forward; elbow up)
   //(facing forward; elbow down)
   //(facing backward; elbow up)
-  //(facing bacward; elbow down)
+  //(facing backward; elbow down)
   using RobotConfiguration = std::vector<double>;
   std::vector<RobotConfiguration> solutions(4);
 
@@ -97,25 +97,327 @@ std::vector<double> kinverse::core::AnalyticalSolver::solveUnrefactored(const Ei
 }
 
 std::vector<std::vector<double>> kinverse::core::AnalyticalSolver::solve(const Eigen::Affine3d& endEffectorTransform) const {
+  std::vector<std::vector<double>> positionalSolutions = solveForPosition(endEffectorTransform);
+  return positionalSolutions;
+}
+
+std::vector<std::vector<double>> kinverse::core::AnalyticalSolver::solveForPosition(const Eigen::Affine3d& endEffectorTransform) const {
+  auto facingForwardElbowUp = getFacingForwardElbowUpSolution(endEffectorTransform);
+  auto facingForwardElbowDown = getFacingForwardElbowDownSolution(endEffectorTransform);
+  auto facingBackwardElbowUp = getFacingBackwardElbowUpSolution(endEffectorTransform);
+  auto facingBackwardElbowDown = getFacingBackwardElbowDownSolution(endEffectorTransform);
+
+  return {
+    facingForwardElbowUp,    //
+    facingForwardElbowDown,  //
+    facingBackwardElbowUp,   //
+    facingBackwardElbowDown  //
+  };
+}
+
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+
+std::vector<double> kinverse::core::AnalyticalSolver::getFacingForwardElbowUpSolution(const Eigen::Affine3d& endEffectorTransform) const {
   const Eigen::Affine3d targetTransform = convertWorldToLocal(endEffectorTransform);
   const Eigen::Vector3d wristPosition = computeWristPosition(targetTransform);
   const Eigen::Vector3d firstJointZAxis = getFirstJointZAxis();
-  if (math::pointLiesOnLine(Eigen::Vector3d::Zero(), firstJointZAxis, wristPosition)) {
-    throw std::domain_error("We have a singularity! Wrist position lies on z0 axis! theta1 has infinite number of solutions!");
-  }
+
+  //@todo uncomment this
+  // if (math::pointLiesOnLine(Eigen::Vector3d::Zero(), firstJointZAxis, wristPosition)) {
+  //  // shoulder singularity (KUKA calls it overhead singularity)
+  //  throw std::domain_error("We have a singularity! Wrist position lies on z0 axis! theta1 has infinite number of solutions!");
+  //}
 
   const double theta1 = std::atan2(wristPosition.y(), wristPosition.x());
 
-  // const auto forwardFacingSolutions = solveForForwardFacing(theta1);
-  // const auto backwardFacingSolutions = solveForBackwardFacing(theta1 + M_PI);
+  // now when we know theta1 we can compute position of the second joint
+  const Eigen::Vector3d secondJointPosition = computeSecondJointPosition(theta1);
 
-  // std::vector<std::vector<double>> solutions{};
-  // solutions.insert(solutions.end(), forwardFacingSolutions.begin(), forwardFacingSolutions.end());
-  // solutions.insert(solutions.end(), backwardFacingSolutions.begin(), backwardFacingSolutions.end());
+  // project wristPosition and secondJointPosition on Oxy plane
+  const Eigen::Vector2d wristPositionProjection{ wristPosition.x(), wristPosition.y() };
+  const Eigen::Vector2d secondJointPositionProjection{ secondJointPosition.x(), secondJointPosition.y() };
 
-  // return solutions;
-  return {};
+  // using Pythagorean theorem we get first equation
+  // a * a = b * b + c * c
+  const double a = (wristPosition - secondJointPosition).norm();
+  const double b = secondJointPosition.z() - wristPosition.z();
+  const double c = (wristPositionProjection - secondJointPositionProjection).norm();
+
+  // using Law of cosines we get another equation
+  // a * a = d * d + e * e - 2.0 * d * e * cosKsi
+  const double d = getDistanceBetweenSecondAndThirdJoints();
+  const double e = getDistanceBetweenThirdJointAndWristPosition();
+
+  // remember that theta3 is positive because we consider elbow up case =>
+  // cosKsi = cos(M_PI + gamma - theta3)
+  // where gamma is the angle between z4 axis and direction from third joint to wrist position
+  const double gamma = computeGamma();
+
+  // using previous considerations we get final equation
+  // a * a = d * d + e * e + 2.0 * d * e * cos(gamma + theta3)
+
+  // we will also need Pythagorean trigonometric identity
+  // sine * sine + cosine * cosine = 1
+  //
+  // where sine and cosine are as follows
+  // cosine = cos(gamma - theta3)
+  // sine = sin(gamma - theta3)
+
+  const double cosine = (b * b + c * c - d * d - e * e) / (2.0 * d * e);
+  const double sine = std::sqrt(1.0 - cosine * cosine);
+
+  const double theta3 = atan2(sine, cosine) + gamma;
+
+  // remember that theta2 is negative because we consider elbow up case
+  // theta2 = -(alpha + beta)
+  //
+  // here we assume that alpha and beta are positive angles of triangles ABC and ADE
+  //
+  // tan(alpha) = b / c     => alpha = atan2(b, c)
+  // tan(beta) = e * sine / (d + e * cosine)
+  //
+  // where sine and cosine are as follows
+  // cosine = cos(gamma - theta3)
+  // sine = sin(gamma - theta3)
+  //
+  //
+  //
+  // e * e = d * d + a * a + 2.0 * d * a * cos(beta)
+  // cos(beta) = (e * e - d * d - a * a) / (2.0 * d * a)
+  const double alpha = atan2(b, c);
+  const double beta = atan2(e * sine, d + e * cosine);
+  const double theta2 = -(alpha + beta);
+
+  return { theta1, theta2, theta3, 0.0, 0.0, 0.0 };
 }
+
+std::vector<double> kinverse::core::AnalyticalSolver::getFacingForwardElbowDownSolution(const Eigen::Affine3d& endEffectorTransform) const {
+  const Eigen::Affine3d targetTransform = convertWorldToLocal(endEffectorTransform);
+  const Eigen::Vector3d wristPosition = computeWristPosition(targetTransform);
+  const Eigen::Vector3d firstJointZAxis = getFirstJointZAxis();
+
+  //@todo uncomment this
+  // if (math::pointLiesOnLine(Eigen::Vector3d::Zero(), firstJointZAxis, wristPosition)) {
+  //  // shoulder singularity (KUKA calls it overhead singularity)
+  //  throw std::domain_error("We have a singularity! Wrist position lies on z0 axis! theta1 has infinite number of solutions!");
+  //}
+
+  const double theta1 = std::atan2(wristPosition.y(), wristPosition.x());
+
+  // now when we know theta1 we can compute position of the second joint
+  const Eigen::Vector3d secondJointPosition = computeSecondJointPosition(theta1);
+
+  // project wristPosition and secondJointPosition on Oxy plane
+  const Eigen::Vector2d wristPositionProjection{ wristPosition.x(), wristPosition.y() };
+  const Eigen::Vector2d secondJointPositionProjection{ secondJointPosition.x(), secondJointPosition.y() };
+
+  // using Pythagorean theorem we get first equation
+  // a * a = b * b + c * c
+  const double a = (wristPosition - secondJointPosition).norm();
+  const double b = secondJointPosition.z() - wristPosition.z();
+  const double c = (wristPositionProjection - secondJointPositionProjection).norm();
+
+  // using Law of cosines we get another equation
+  // a * a = d * d + e * e - 2.0 * d * e * cosKsi
+  const double d = getDistanceBetweenSecondAndThirdJoints();
+  const double e = getDistanceBetweenThirdJointAndWristPosition();
+
+  // remember that theta3 is positive because we consider elbow down case =>
+  // cosKsi = cos(M_PI + gamma - theta3)
+  // where gamma is the angle between z4 axis and direction from third joint to wrist position
+  const double gamma = computeGamma();
+
+  // using previous considerations we get final equation
+  // a * a = d * d + e * e + 2.0 * d * e * cos(gamma + theta3)
+
+  // we will also need Pythagorean trigonometric identity
+  // sine * sine + cosine * cosine = 1
+  //
+  // where sine and cosine are as follows
+  // cosine = cos(gamma - theta3)
+  // sine = sin(gamma - theta3)
+
+  const double cosine = (b * b + c * c - d * d - e * e) / (2.0 * d * e);
+  const double sine = -std::sqrt(1.0 - cosine * cosine);
+
+  const double theta3 = atan2(sine, cosine) + gamma;
+
+  // remember that theta2 is negative because we consider elbow down case
+  // theta2 = -(alpha + beta)
+  //
+  // here we assume that alpha and beta are positive angles of triangles ABC and ADE
+  //
+  // tan(alpha) = b / c     => alpha = atan2(b, c)
+  // tan(beta) = e * sine / (d + e * cosine)
+  //
+  // where sine and cosine are as follows
+  // cosine = cos(gamma - theta3)
+  // sine = sin(gamma - theta3)
+  //
+  //
+  //
+  // e * e = d * d + a * a + 2.0 * d * a * cos(beta)
+  // cos(beta) = (e * e - d * d - a * a) / (2.0 * d * a)
+  const double alpha = atan2(b, c);
+  const double beta = atan2(e * sine, d + e * cosine);
+  const double theta2 = -(alpha + beta);
+
+  return { theta1, theta2, theta3, 0.0, 0.0, 0.0 };
+}
+
+std::vector<double> kinverse::core::AnalyticalSolver::getFacingBackwardElbowUpSolution(const Eigen::Affine3d& endEffectorTransform) const {
+  const Eigen::Affine3d targetTransform = convertWorldToLocal(endEffectorTransform);
+  const Eigen::Vector3d wristPosition = computeWristPosition(targetTransform);
+  const Eigen::Vector3d firstJointZAxis = getFirstJointZAxis();
+
+  //@todo uncomment this
+  // if (math::pointLiesOnLine(Eigen::Vector3d::Zero(), firstJointZAxis, wristPosition)) {
+  //  // shoulder singularity (KUKA calls it overhead singularity)
+  //  throw std::domain_error("We have a singularity! Wrist position lies on z0 axis! theta1 has infinite number of solutions!");
+  //}
+
+  const double theta1 = std::atan2(wristPosition.y(), wristPosition.x()) + M_PI;
+
+  // now when we know theta1 we can compute position of the second joint
+  const Eigen::Vector3d secondJointPosition = computeSecondJointPosition(theta1);
+
+  // project wristPosition and secondJointPosition on Oxy plane
+  const Eigen::Vector2d wristPositionProjection{ wristPosition.x(), wristPosition.y() };
+  const Eigen::Vector2d secondJointPositionProjection{ secondJointPosition.x(), secondJointPosition.y() };
+
+  // using Pythagorean theorem we get first equation
+  // a * a = b * b + c * c
+  const double a = (wristPosition - secondJointPosition).norm();
+  const double b = secondJointPosition.z() - wristPosition.z();
+  const double c = (wristPositionProjection - secondJointPositionProjection).norm();
+
+  // using Law of cosines we get another equation
+  // a * a = d * d + e * e - 2.0 * d * e * cosKsi
+  const double d = getDistanceBetweenSecondAndThirdJoints();
+  const double e = getDistanceBetweenThirdJointAndWristPosition();
+
+  // remember that theta3 is negative because we consider elbow up case =>
+  // cosKsi = cos(M_PI + gamma + theta3)
+  // where gamma is the angle between z4 axis and direction from third joint to wrist position
+  const double gamma = computeGamma();
+
+  // using previous considerations we get final equation
+  // a * a = d * d + e * e + 2.0 * d * e * cos(gamma + theta3)
+
+  // we will also need Pythagorean trigonometric identity
+  // sine * sine + cosine * cosine = 1
+  //
+  // where sine and cosine are as follows
+  // cosine = cos(gamma - theta3)
+  // sine = sin(gamma - theta3)
+
+  const double cosine = (b * b + c * c - d * d - e * e) / (2.0 * d * e);
+  const double sine = std::sqrt(1.0 - cosine * cosine);
+
+  const double theta3 = -atan2(sine, cosine) + gamma;
+
+  // remember that theta2 is negative because we consider elbow up case
+  // theta2 = -(alpha + beta)
+  //
+  // here we assume that alpha and beta are positive angles of triangles ABC and ADE
+  //
+  // tan(alpha) = b / c     => alpha = atan2(b, c)
+  // tan(beta) = e * sine / (d + e * cosine)
+  //
+  // where sine and cosine are as follows
+  // cosine = cos(gamma - theta3)
+  // sine = sin(gamma - theta3)
+  //
+  //
+  //
+  // e * e = d * d + a * a + 2.0 * d * a * cos(beta)
+  // cos(beta) = (e * e - d * d - a * a) / (2.0 * d * a)
+  const double alpha = atan2(b, c);
+  const double beta = atan2(e * sine, d + e * cosine);
+  const double theta2 = (alpha + beta) - M_PI;
+
+  return { theta1, theta2, theta3, 0.0, 0.0, 0.0 };
+}
+
+std::vector<double> kinverse::core::AnalyticalSolver::getFacingBackwardElbowDownSolution(const Eigen::Affine3d& endEffectorTransform) const {
+  const Eigen::Affine3d targetTransform = convertWorldToLocal(endEffectorTransform);
+  const Eigen::Vector3d wristPosition = computeWristPosition(targetTransform);
+  const Eigen::Vector3d firstJointZAxis = getFirstJointZAxis();
+
+  //@todo uncomment this
+  // if (math::pointLiesOnLine(Eigen::Vector3d::Zero(), firstJointZAxis, wristPosition)) {
+  //  // shoulder singularity (KUKA calls it overhead singularity)
+  //  throw std::domain_error("We have a singularity! Wrist position lies on z0 axis! theta1 has infinite number of solutions!");
+  //}
+
+  const double theta1 = std::atan2(wristPosition.y(), wristPosition.x()) + M_PI;
+
+  // now when we know theta1 we can compute position of the second joint
+  const Eigen::Vector3d secondJointPosition = computeSecondJointPosition(theta1);
+
+  // project wristPosition and secondJointPosition on Oxy plane
+  const Eigen::Vector2d wristPositionProjection{ wristPosition.x(), wristPosition.y() };
+  const Eigen::Vector2d secondJointPositionProjection{ secondJointPosition.x(), secondJointPosition.y() };
+
+  // using Pythagorean theorem we get first equation
+  // a * a = b * b + c * c
+  const double a = (wristPosition - secondJointPosition).norm();
+  const double b = secondJointPosition.z() - wristPosition.z();
+  const double c = (wristPositionProjection - secondJointPositionProjection).norm();
+
+  // using Law of cosines we get another equation
+  // a * a = d * d + e * e - 2.0 * d * e * cosKsi
+  const double d = getDistanceBetweenSecondAndThirdJoints();
+  const double e = getDistanceBetweenThirdJointAndWristPosition();
+
+  // remember that theta3 is negative because we consider elbow up case =>
+  // cosKsi = cos(M_PI + gamma + theta3)
+  // where gamma is the angle between z4 axis and direction from third joint to wrist position
+  const double gamma = computeGamma();
+
+  // using previous considerations we get final equation
+  // a * a = d * d + e * e + 2.0 * d * e * cos(gamma + theta3)
+
+  // we will also need Pythagorean trigonometric identity
+  // sine * sine + cosine * cosine = 1
+  //
+  // where sine and cosine are as follows
+  // cosine = cos(gamma - theta3)
+  // sine = sin(gamma - theta3)
+
+  const double cosine = (b * b + c * c - d * d - e * e) / (2.0 * d * e);
+  const double sine = -std::sqrt(1.0 - cosine * cosine);
+
+  const double theta3 = -atan2(sine, cosine) + gamma;
+
+  // remember that theta2 is negative because we consider elbow up case
+  // theta2 = -(alpha + beta)
+  //
+  // here we assume that alpha and beta are positive angles of triangles ABC and ADE
+  //
+  // tan(alpha) = b / c     => alpha = atan2(b, c)
+  // tan(beta) = e * sine / (d + e * cosine)
+  //
+  // where sine and cosine are as follows
+  // cosine = cos(gamma - theta3)
+  // sine = sin(gamma - theta3)
+  //
+  //
+  //
+  // e * e = d * d + a * a + 2.0 * d * a * cos(beta)
+  // cos(beta) = (e * e - d * d - a * a) / (2.0 * d * a)
+  const double alpha = atan2(b, c);
+  const double beta = atan2(e * sine, d + e * cosine);
+  const double theta2 = (alpha + beta) - M_PI;
+
+  return { theta1, theta2, theta3, 0.0, 0.0, 0.0 };
+}
+
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
 
 Eigen::Affine3d kinverse::core::AnalyticalSolver::convertWorldToLocal(const Eigen::Affine3d& transform) const {
   return m_robot->getBaseTransform().inverse() * transform;
@@ -131,6 +433,18 @@ Eigen::Vector3d kinverse::core::AnalyticalSolver::computeWristPosition(const Eig
 
 Eigen::Vector3d kinverse::core::AnalyticalSolver::getFirstJointZAxis() const {
   return m_robot->getDHTable().front().getTransform().rotation().col(2);
+}
+
+Eigen::Vector3d kinverse::core::AnalyticalSolver::computeSecondJointPosition(double theta1) const {
+  return m_robot->getDHTable().front().getTransform(theta1).translation();
+}
+
+double kinverse::core::AnalyticalSolver::getDistanceBetweenSecondAndThirdJoints() const {
+  return m_robot->getDHTable()[1].getTransform().translation().norm();
+}
+
+double kinverse::core::AnalyticalSolver::getDistanceBetweenThirdJointAndWristPosition() const {
+  return (m_robot->getDHTable()[2].getTransform() * m_robot->getDHTable()[3].getTransform()).translation().norm();
 }
 
 double kinverse::core::AnalyticalSolver::computeGamma() const {
