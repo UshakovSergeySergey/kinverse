@@ -12,27 +12,37 @@ namespace kinverse {
       using ConstPtr = std::shared_ptr<const AnalyticalSolver>;
 
       explicit AnalyticalSolver(Robot::ConstPtr robot);
-      std::vector<std::vector<double>> solve(const Eigen::Affine3d& endEffectorTransform) const;
-      std::vector<double> solveUnrefactored(const Eigen::Affine3d& endEffectorTransform) const;
+      std::vector<std::vector<double>> solve(const Eigen::Affine3d& endEffectorTransform);
 
      private:
-      Eigen::Affine3d convertWorldToLocal(const Eigen::Affine3d& transform) const;
-      Eigen::Vector3d computeWristPosition(const Eigen::Affine3d& targetTransform) const;
-      Eigen::Vector3d getFirstJointZAxis() const;
-      Eigen::Vector3d computeSecondJointPosition(double theta1) const;
+      double computeGamma() const;
       double getDistanceBetweenSecondAndThirdJoints() const;
       double getDistanceBetweenThirdJointAndWristPosition() const;
-
-      double computeGamma() const;
+      Eigen::Affine3d convertWorldToLocal(const Eigen::Affine3d& transform) const;
+      Eigen::Vector3d computeWristPosition(const Eigen::Affine3d& targetTransform) const;
+      std::vector<std::vector<double>> solveForPosition() const;
+      std::vector<std::vector<double>> solvePosition(double theta1, bool facingForward) const;
+      void getTriangle(double theta1, double& a, double& b, double& c) const;
+      Eigen::Vector3d computeSecondJointPosition(double theta1) const;
+      std::vector<std::vector<double>> solveForOrientation(const std::vector<double>& configuration) const;
       Eigen::Matrix3d computeWristOrientation(double theta1, double theta2, double theta3) const;
 
       Robot::ConstPtr m_robot{ nullptr };
+      /**
+       * @brief Stores angle between robot's Z4 axis and direction from third joint to wrist position.
+       */
+      double m_gamma{ 0.0 };
+      double m_distanceFromSecondToThirdJoint{ 0.0 };
+      double m_distanceFromThirdJointToWrist{ 0.0 };
+      Eigen::Affine3d m_targetTransform{ Eigen::Affine3d::Identity() };
+      Eigen::Vector3d m_wristPosition{ Eigen::Vector3d::Zero() };
 
       /////////////////////////////////////////
       /////////////////////////////////////////
       /////////////////////////////////////////
 
-      std::vector<std::vector<double>> solveForPosition(const Eigen::Affine3d& endEffectorTransform) const;
+      std::vector<double> solveUnrefactored(const Eigen::Affine3d& endEffectorTransform) const;
+      Eigen::Vector3d getFirstJointZAxis() const;
       std::vector<double> getFacingForwardElbowUpSolution(const Eigen::Affine3d& endEffectorTransform) const;
       std::vector<double> getFacingForwardElbowDownSolution(const Eigen::Affine3d& endEffectorTransform) const;
       std::vector<double> getFacingBackwardElbowUpSolution(const Eigen::Affine3d& endEffectorTransform) const;
