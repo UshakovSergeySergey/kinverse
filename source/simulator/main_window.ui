@@ -363,6 +363,35 @@
         </widget>
        </item>
        <item>
+        <widget class="QGroupBox" name="groupBox_4">
+         <property name="title">
+          <string>End effector transform source</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <widget class="QRadioButton" name="radioButton_endEffectorFromGUI">
+            <property name="text">
+             <string>GUI</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="radioButton_endEffectorFromRobot">
+            <property name="text">
+             <string>Robot</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+         <zorder>pushButton_solveInverseKinematics</zorder>
+         <zorder>radioButton_endEffectorFromRobot</zorder>
+         <zorder>radioButton_endEffectorFromGUI</zorder>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="pushButton_solveInverseKinematics">
          <property name="toolTip">
           <string>Solves inverse kinematics task analytically for current end effector position</string>

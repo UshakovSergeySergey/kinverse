@@ -25,6 +25,14 @@ kinverse::simulator::MainWindow::MainWindow(QWidget* parent) : QMainWindow{ pare
   QObject::connect(m_ui.doubleSpinBox_A5, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::onAxisValueChanged);
   QObject::connect(m_ui.doubleSpinBox_A6, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::onAxisValueChanged);
 
+  // change end effector transform
+  /*QObject::connect(m_ui.doubleSpinBox_X, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::onFindAnalyticalSolution);
+  QObject::connect(m_ui.doubleSpinBox_Y, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::onFindAnalyticalSolution);
+  QObject::connect(m_ui.doubleSpinBox_Z, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::onFindAnalyticalSolution);
+  QObject::connect(m_ui.doubleSpinBox_A, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::onFindAnalyticalSolution);
+  QObject::connect(m_ui.doubleSpinBox_B, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::onFindAnalyticalSolution);
+  QObject::connect(m_ui.doubleSpinBox_C, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::onFindAnalyticalSolution);*/
+
   // solve IK analytically
   QObject::connect(m_ui.pushButton_solveInverseKinematics, &QPushButton::pressed, this, &MainWindow::onFindAnalyticalSolution);
 
@@ -84,7 +92,7 @@ void kinverse::simulator::MainWindow::initializeProgressIcon() {
 }
 
 void kinverse::simulator::MainWindow::onAxisValueChanged() const {
-  const std::vector<double> configuration = extractRobotConfigurationFromGui();
+  const std::vector<double> configuration = getGuiAxisValues();
 
   m_robot->setConfiguration(configuration);
   m_kinematicDiagramGizmo->updateRobotConfiguration();
@@ -92,10 +100,12 @@ void kinverse::simulator::MainWindow::onAxisValueChanged() const {
 
   if (configurationViolatesConstraints(configuration)) {
     const std::vector<double> clampedConfiguration = m_robot->getConfiguration();
-    updateAxesValuesGui(clampedConfiguration);
+    setGuiAxisValues(clampedConfiguration);
   }
 
-  updateEndEffectorTransformGui();
+  //  return;
+  const Eigen::Affine3d endEffectorTransform = m_robot->getLinkCoordinateFrames().back();
+  setGuiEndEffectorTransform(endEffectorTransform);
 }
 
 void kinverse::simulator::MainWindow::onRobotAppearanceChanged() {
@@ -137,7 +147,7 @@ void kinverse::simulator::MainWindow::onSolutionSelected(const QItemSelection& s
     configuration[jointCounter] = jointValue;
   }
 
-  updateAxesValuesGui(configuration);
+  setGuiAxisValues(configuration);
 
   m_robot->setConfiguration(configuration);
   m_robotGizmo->updateRobotConfiguration();
@@ -153,16 +163,30 @@ void kinverse::simulator::MainWindow::enableGui(bool enabled) const {
   }
 }
 
-std::vector<double> kinverse::simulator::MainWindow::extractRobotConfigurationFromGui() const {
+std::vector<double> kinverse::simulator::MainWindow::getGuiAxisValues() const {
   const std::vector<double> configuration{ math::degreesToRadians(m_ui.doubleSpinBox_A1->value()), math::degreesToRadians(m_ui.doubleSpinBox_A2->value()),
                                            math::degreesToRadians(m_ui.doubleSpinBox_A3->value()), math::degreesToRadians(m_ui.doubleSpinBox_A4->value()),
                                            math::degreesToRadians(m_ui.doubleSpinBox_A5->value()), math::degreesToRadians(m_ui.doubleSpinBox_A6->value()) };
   return configuration;
 }
 
-void kinverse::simulator::MainWindow::updateEndEffectorTransformGui() const {
-  const Eigen::Affine3d endEffectorTransform = m_robot->getLinkCoordinateFrames().back();
+void kinverse::simulator::MainWindow::setGuiAxisValues(const std::vector<double>& configuration) const {
+  m_ui.doubleSpinBox_A1->setValue(math::radiansToDegrees(configuration[0]));
+  m_ui.doubleSpinBox_A2->setValue(math::radiansToDegrees(configuration[1]));
+  m_ui.doubleSpinBox_A3->setValue(math::radiansToDegrees(configuration[2]));
+  m_ui.doubleSpinBox_A4->setValue(math::radiansToDegrees(configuration[3]));
+  m_ui.doubleSpinBox_A5->setValue(math::radiansToDegrees(configuration[4]));
+  m_ui.doubleSpinBox_A6->setValue(math::radiansToDegrees(configuration[5]));
+}
 
+Eigen::Affine3d kinverse::simulator::MainWindow::getGuiEndEffectorTransform() const {
+  const Eigen::Vector3d xyz{ m_ui.doubleSpinBox_X->value(), m_ui.doubleSpinBox_Y->value(), m_ui.doubleSpinBox_Z->value() };
+  Eigen::Vector3d abc{ m_ui.doubleSpinBox_A->value(), m_ui.doubleSpinBox_B->value(), m_ui.doubleSpinBox_C->value() };
+  abc = abc * M_PI / 180.0;
+  return math::fromXYZABC(xyz, abc);
+}
+
+void kinverse::simulator::MainWindow::setGuiEndEffectorTransform(const Eigen::Affine3d& endEffectorTransform) const {
   Eigen::Vector3d xyz;
   Eigen::Vector3d abc;
   math::toXYZABC(endEffectorTransform, xyz, abc);
@@ -175,15 +199,6 @@ void kinverse::simulator::MainWindow::updateEndEffectorTransformGui() const {
   m_ui.doubleSpinBox_A->setValue(abc.x());
   m_ui.doubleSpinBox_B->setValue(abc.y());
   m_ui.doubleSpinBox_C->setValue(abc.z());
-}
-
-void kinverse::simulator::MainWindow::updateAxesValuesGui(const std::vector<double>& configuration) const {
-  m_ui.doubleSpinBox_A1->setValue(math::radiansToDegrees(configuration[0]));
-  m_ui.doubleSpinBox_A2->setValue(math::radiansToDegrees(configuration[1]));
-  m_ui.doubleSpinBox_A3->setValue(math::radiansToDegrees(configuration[2]));
-  m_ui.doubleSpinBox_A4->setValue(math::radiansToDegrees(configuration[3]));
-  m_ui.doubleSpinBox_A5->setValue(math::radiansToDegrees(configuration[4]));
-  m_ui.doubleSpinBox_A6->setValue(math::radiansToDegrees(configuration[5]));
 }
 
 void kinverse::simulator::MainWindow::updateListOfIKSolutionsGui(const std::vector<std::vector<double>>& solutions) const {
@@ -243,12 +258,23 @@ bool kinverse::simulator::MainWindow::configurationViolatesConstraints(const std
 }
 
 void kinverse::simulator::MainWindow::solveIK() {
+  const bool takeTransformFromGui = m_ui.radioButton_endEffectorFromGUI->isChecked();
+
   Eigen::Affine3d endEffectorTransform = m_robot->getLinkCoordinateFrames().back();
-  auto solutions = m_ikSolver->solve(endEffectorTransform);
+  if (takeTransformFromGui)
+    endEffectorTransform = getGuiEndEffectorTransform();
 
-  // @todo remove this two lines and make solutions const
-  const auto currentRobotConfiguration = m_robot->getConfiguration();
-  solutions.insert(solutions.begin(), currentRobotConfiguration);
+  try {
+    const std::vector<std::vector<double>> solutions = m_ikSolver->solve(endEffectorTransform);
+    emit solvedIKSignal(solutions);
+    return;
+  } catch (std::exception& exception) {
+    std::cerr << "Failed to solve IK:" << std::endl;
+    std::cerr << exception.what() << std::endl;
+  } catch (...) {
+    std::cerr << "Failed to solve IK:" << std::endl;
+    std::cerr << "Caught unknown exception!" << std::endl;
+  }
 
-  emit solvedIKSignal(solutions);
+  emit solvedIKSignal({});
 }

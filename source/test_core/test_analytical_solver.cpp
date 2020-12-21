@@ -30,18 +30,31 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "stdafx.h"
+#include "test_analytical_solver.h"
+#include <kinverse/core/analytical_solver.h>
+#include <kinverse/factory/robot_factory.h>
+#include <kinverse/math/math.h>
 
-#pragma warning(disable : 4251)  // Warning C4251 class needs to have dll - interface to be used by clients of class
-#pragma warning(disable : 4275)  // Warning C4275 non dll - interface class used as base for dll - interface class
+namespace kinverse {
+  namespace core {
 
-#pragma warning(push)
+    TEST_F(TestAnalyticalSolver, Solve_WhenShoulderSingularityDetected_ThrowsException) {
+      // arrange
+      auto robot = factory::RobotFactory::create(RobotType::KukaKR5Arc);
+      auto ikSolver = std::make_shared<AnalyticalSolver>(robot);
 
-#define _USE_MATH_DEFINES
-#include <cmath>
+      const Eigen::Vector3d xyz{ 0.0, 0.0, 1000.0 };
+      const Eigen::Vector3d abc{ 0.0, 0.0, 0.0 };
+      const Eigen::Affine3d endEffectorTransform = math::fromXYZABC(xyz, abc);
 
-#include <Eigen/Geometry>
+      // act assert
+      EXPECT_THROW(ikSolver->solve(endEffectorTransform), std::exception);
+    }
 
-#include <gtest/gtest.h>
-
-#pragma warning(pop)
+    // ShoulderSingularity
+    // ElbowSingularity
+    // WristSingularity
+    // PointIsUnreachable
+  }  // namespace core
+}  // namespace kinverse

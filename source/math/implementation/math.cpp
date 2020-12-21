@@ -53,5 +53,10 @@ Eigen::Affine3d kinverse::math::fromXYZABC(const Eigen::Vector3d& xyz, const Eig
 }
 
 bool kinverse::math::pointLiesOnLine(const Eigen::Vector3d& origin, const Eigen::Vector3d& direction, const Eigen::Vector3d& point) {
-  throw std::exception("Not implemented yet!");
+  const Eigen::Vector3d p0 = origin;
+  const Eigen::Vector3d p1 = origin + direction;
+
+  const double squaredDistance = (point - p0).cross(point - p1).squaredNorm() / (p1 - p0).squaredNorm();
+
+  return (squaredDistance < 1.0e-6);
 }

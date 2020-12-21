@@ -1,6 +1,37 @@
-﻿#include "stdafx.h"
+﻿/**
+ * BSD 3-Clause License
+ *
+ * Copyright (c) 2020, Sergey Ushakov
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived from
+ *    this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+#include "stdafx.h"
 #include "../include/kinverse/core/robot.h"
-#include <kinverse/math/math.h>
 
 void kinverse::core::Robot::setDHTable(const std::vector<DenavitHartenbergParameters>& dhTable) {
   m_dhTable = dhTable;
@@ -102,121 +133,6 @@ std::vector<double> kinverse::core::Robot::getAxisValues(const std::vector<doubl
   }
 
   return axisValues;
-}
-
-/*
-std::vector<Eigen::Affine3d> kinverse::core::Robot::getFrames() const {
-  Eigen::Quaterniond rotation = Eigen::Quaterniond::FromTwoVectors(Eigen::Vector3d::UnitZ(), jointAxis);
-  Eigen::Affine3d transform;
-  transform = Eigen::Translation3d(displacementVector) * rotation;
-  m_frames.push_back(transform);
-
-  return m_frames;
-}
-*/
-/*
-     public:
-      getEndEffectorCoordinateFrame();
-      / **
-       * @param[in] jointAxis - axis of revolution or direction of motion in case of prismatic joint
-       * @param[in] displacementVector - displacement vector from the previous frame
-       * @param[in] jointType - joint type (revolute or prismatic)
-       * @param[in] jointName - joint name (e.g. A1 or A2)
-       * /
-
-      std::vector<Eigen::Affine3d> getFrames() const;
-*/
-
-/*
-number of rows in jacobian matrix       = 6 (xyzabc)
-number of columns in jacobian matrix    = number of joints
-
-
-
-
-linear
-rotational
-*/
-
-Eigen::MatrixXd kinverse::core::Robot::computePositionJacobian() const {
-  // Jacobian matrix defines the relationship between joint velocities and end-effector velocities.
-  const unsigned int numberOfRows = 3;
-  const unsigned int numberOfColumns = getNumberOfJoints();
-
-  Eigen::MatrixXd jacobian(numberOfRows, numberOfColumns);
-  jacobian.setZero();
-
-  const auto linkFrames = getLinkCoordinateFrames();
-  const Eigen::Vector3d endEffectorPosition = linkFrames.back().translation();
-  for (auto jointCounter = 0u; jointCounter < getNumberOfJoints(); ++jointCounter) {
-    const Eigen::Vector3d jointAxis = linkFrames[jointCounter].rotation().col(2);
-
-    Eigen::Vector3d linear;
-
-    if (m_dhTable[jointCounter].getJointType() == JointType::Prismatic) {
-      linear = jointAxis;
-    } else {
-      const Eigen::Vector3d jointPosition = linkFrames[jointCounter].translation();
-
-      linear = jointAxis.cross(endEffectorPosition - jointPosition);
-    }
-
-    jacobian.col(jointCounter) << linear;
-  }
-
-  return jacobian;
-}
-
-Eigen::MatrixXd kinverse::core::Robot::computeJacobian() const {
-  // Jacobian matrix defines the relationship between joint velocities and end-effector velocities.
-  const unsigned int numberOfRows = 6;
-  const unsigned int numberOfColumns = getNumberOfJoints();
-
-  Eigen::MatrixXd jacobian(numberOfRows, numberOfColumns);
-  jacobian.setZero();
-
-  const auto linkFrames = getLinkCoordinateFrames();
-  const Eigen::Vector3d endEffectorPosition = linkFrames.back().translation();
-  for (auto jointCounter = 0u; jointCounter < getNumberOfJoints(); ++jointCounter) {
-    const Eigen::Vector3d jointAxis = linkFrames[jointCounter].rotation().col(2);
-
-    Eigen::Vector3d linear;
-    Eigen::Vector3d rotational;
-
-    if (m_dhTable[jointCounter].getJointType() == JointType::Prismatic) {
-      linear = jointAxis;
-      rotational = { 0.0, 0.0, 0.0 };
-    } else {
-      const Eigen::Vector3d jointPosition = linkFrames[jointCounter].translation();
-
-      linear = jointAxis.cross(endEffectorPosition - jointPosition);
-      rotational = jointAxis;
-    }
-
-    jacobian.col(jointCounter) << linear, rotational;
-  }
-
-  return jacobian;
-
-  /*
-   * compute the Jacobian
-   * compute pseudoinverse of the Jacobian
-   * deltaAxes = pseudoInverseJacobian * deltaEndEffector
-   * axes = axes + alpha * deltaAxes
-   */
-}
-
-Eigen::MatrixXd kinverse::core::Robot::computeInverseJacobian(const Eigen::MatrixXd& jacobian) const {
-  if (jacobian.cols() == jacobian.rows())
-    return jacobian.inverse();
-
-  return jacobian.transpose();
-  return (jacobian.transpose() * jacobian).inverse() * jacobian.transpose();
-
-  //  return jacobian.transpose();
-
-  // matrix is not square, compute pseudoinverse jacobian
-  //  return (jacobian.transpose() * jacobian).inverse() * jacobian.transpose();
 }
 
 void kinverse::core::Robot::setBaseTransform(const Eigen::Affine3d& transform) {

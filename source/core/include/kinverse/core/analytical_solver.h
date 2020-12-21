@@ -21,6 +21,7 @@ namespace kinverse {
       Eigen::Affine3d convertWorldToLocal(const Eigen::Affine3d& transform) const;
       Eigen::Vector3d computeWristPosition(const Eigen::Affine3d& targetTransform) const;
       std::vector<std::vector<double>> solveForPosition() const;
+      Eigen::Vector3d getFirstJointZAxis() const;
       std::vector<std::vector<double>> solvePosition(double theta1, bool facingForward) const;
       void getTriangle(double theta1, double& a, double& b, double& c) const;
       Eigen::Vector3d computeSecondJointPosition(double theta1) const;
@@ -36,17 +37,6 @@ namespace kinverse {
       double m_distanceFromThirdJointToWrist{ 0.0 };
       Eigen::Affine3d m_targetTransform{ Eigen::Affine3d::Identity() };
       Eigen::Vector3d m_wristPosition{ Eigen::Vector3d::Zero() };
-
-      /////////////////////////////////////////
-      /////////////////////////////////////////
-      /////////////////////////////////////////
-
-      std::vector<double> solveUnrefactored(const Eigen::Affine3d& endEffectorTransform) const;
-      Eigen::Vector3d getFirstJointZAxis() const;
-      std::vector<double> getFacingForwardElbowUpSolution(const Eigen::Affine3d& endEffectorTransform) const;
-      std::vector<double> getFacingForwardElbowDownSolution(const Eigen::Affine3d& endEffectorTransform) const;
-      std::vector<double> getFacingBackwardElbowUpSolution(const Eigen::Affine3d& endEffectorTransform) const;
-      std::vector<double> getFacingBackwardElbowDownSolution(const Eigen::Affine3d& endEffectorTransform) const;
     };
 
   }  // namespace core

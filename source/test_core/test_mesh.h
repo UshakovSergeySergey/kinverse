@@ -32,16 +32,10 @@
 
 #pragma once
 
-#pragma warning(disable : 4251)  // Warning C4251 class needs to have dll - interface to be used by clients of class
-#pragma warning(disable : 4275)  // Warning C4275 non dll - interface class used as base for dll - interface class
+namespace kinverse {
+  namespace core {
 
-#pragma warning(push)
+    class TestMesh : public testing::Test {};
 
-#define _USE_MATH_DEFINES
-#include <cmath>
-
-#include <Eigen/Geometry>
-
-#include <gtest/gtest.h>
-
-#pragma warning(pop)
+  }  // namespace core
+}  // namespace kinverse

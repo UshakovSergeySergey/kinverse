@@ -30,18 +30,35 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "stdafx.h"
+#include "test_robot.h"
 
-#pragma warning(disable : 4251)  // Warning C4251 class needs to have dll - interface to be used by clients of class
-#pragma warning(disable : 4275)  // Warning C4275 non dll - interface class used as base for dll - interface class
+namespace kinverse {
+  namespace core {}
+}  // namespace kinverse
 
-#pragma warning(push)
+/*
+void setDHTable(const std::vector<DenavitHartenbergParameters>& dhTable);
+std::vector<DenavitHartenbergParameters> getDHTable() const;
+void setConfiguration(const std::vector<double>& configuration);
+std::vector<double> getConfiguration() const;
+void setJointConstraints(const std::vector<JointConstraints>& constraints);
+std::vector<JointConstraints> getJointConstraints() const;
+void setBaseTransform(const Eigen::Affine3d& transform);
+Eigen::Affine3d getBaseTransform() const;
+void setTransform(const Eigen::Affine3d& transform);
+Eigen::Affine3d getTransform() const;
+void setMeshes(const std::vector<Mesh::ConstPtr>& meshes);
+std::vector<Mesh::ConstPtr> getMeshes() const;
+unsigned int getNumberOfJoints() const;
+unsigned int getNumberOfLinks() const;
+std::vector<Eigen::Affine3d> getJointCoordinateFrames() const;
+std::vector<Eigen::Affine3d> getLinkCoordinateFrames() const;
+std::vector<double> getAxisValues(const std::vector<double>& axisValues) const;
 
-#define _USE_MATH_DEFINES
-#include <cmath>
-
-#include <Eigen/Geometry>
-
-#include <gtest/gtest.h>
-
-#pragma warning(pop)
+Eigen::Affine3d m_baseTransform{ Eigen::Affine3d::Identity() };
+std::vector<DenavitHartenbergParameters> m_dhTable{};
+std::vector<JointConstraints> m_constraints{};
+std::vector<double> m_configuration{};
+std::vector<Mesh::ConstPtr> m_meshes{};
+*/

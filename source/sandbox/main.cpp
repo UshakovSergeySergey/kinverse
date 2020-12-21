@@ -43,9 +43,6 @@ int debugVisualizer();
 
 int main(int argc, char** argv) {
   return debugVisualizer();
-  // бага, если поставить робота в конфигурацию (0, 0, 0, 0, 0, 0) и взять координаты endeffector как таргет для ik, решение будет странным, почему он
-  // складывается в гармошку?
-
   // create robot
   auto robot = kinverse::factory::RobotFactory::create(kinverse::core::RobotType::KukaKR5Arc);
 
@@ -87,10 +84,10 @@ int main(int argc, char** argv) {
   auto ikSolver = std::make_shared<kinverse::core::AnalyticalSolver>(robot);
 
   // solve IK
-  const auto configuration = ikSolver->solveUnrefactored(targetTransform);
+  const auto solutions = ikSolver->solve(targetTransform);
 
   // set robot configuration
-  robot->setConfiguration(configuration);
+  robot->setConfiguration(solutions.front());
   robotGizmo->updateRobotConfiguration();
 
   // print info
