@@ -32,10 +32,14 @@
 
 #pragma once
 
+#include <kinverse/core/denavit_hartenberg_parameters.h>
+
 namespace kinverse {
   namespace core {
 
-    class TestDenavitHartenbergParameters : public testing::Test {
+    using DHParamsEquality = std::tuple<DenavitHartenbergParameters, DenavitHartenbergParameters, bool>;
+
+    class TestDenavitHartenbergParameters : public testing::Test, public testing::WithParamInterface<DHParamsEquality> {
      protected:
       Eigen::Matrix4d getDHMatrix(double d, double theta, double r, double alpha, double angle, double distance) const {
         const double cosTheta = cos(theta + angle);
@@ -121,6 +125,17 @@ namespace kinverse {
         return matrix;
       }
     };
+
+    INSTANTIATE_TEST_SUITE_P(EqualityOperator,
+                             TestDenavitHartenbergParameters,
+                             testing::Values(                                                                                                                //
+                                 DHParamsEquality{ { JointType::Prismatic, 1.0, 2.0, 3.0, 4.0 }, { JointType::Prismatic, 1.0, 2.0, 3.0, 4.0 }, true },       //
+                                 DHParamsEquality{ { JointType::Prismatic, 1.0, 2.0, 3.0, 4.0 }, { JointType::Revolute, 1.0, 2.0, 3.0, 4.0 }, false },       //
+                                 DHParamsEquality{ { JointType::Prismatic, 459.0, 2.0, 3.0, 4.0 }, { JointType::Prismatic, 1.0, 2.0, 3.0, 4.0 }, false },    //
+                                 DHParamsEquality{ { JointType::Prismatic, 1.0, 2.0, 3.0, 4.0 }, { JointType::Prismatic, 1.0, 6598.0, 3.0, 4.0 }, false },   //
+                                 DHParamsEquality{ { JointType::Prismatic, 1.0, 2.0, -34.082, 4.0 }, { JointType::Prismatic, 1.0, 2.0, 3.0, 4.0 }, false },  //
+                                 DHParamsEquality{ { JointType::Prismatic, 1.0, 2.0, 3.0, 4.0 }, { JointType::Prismatic, 1.0, 2.0, 3.0, 4330.304 }, false }  //
+                                 ));
 
   }  // namespace core
 }  // namespace kinverse

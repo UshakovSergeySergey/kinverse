@@ -32,10 +32,50 @@
 
 #pragma once
 
+#include <kinverse/core/mesh.h>
+
 namespace kinverse {
   namespace core {
 
-    class TestMesh : public testing::Test {};
+    using MeshEquality = std::tuple<Mesh, Mesh, bool>;
+
+    class TestMesh : public testing::Test, public testing::WithParamInterface<MeshEquality> {};
+
+    INSTANTIATE_TEST_SUITE_P(
+        EqualityOperator,
+        TestMesh,
+        testing::Values(
+
+            // case of equal meshes
+            MeshEquality{ Mesh{ Mesh::Vertices{ { 1.0, 1.0, 1.0 }, { 2.0, 3.0, 4.0 } }, Mesh::Faces{ { 0, 1, 2 }, { 3, 4, 5, 6 } } },
+                          Mesh{ Mesh::Vertices{ { 1.0, 1.0, 1.0 }, { 2.0, 3.0, 4.0 } }, Mesh::Faces{ { 0, 1, 2 }, { 3, 4, 5, 6 } } },
+                          true },
+
+            // case of different index buffers
+            MeshEquality{ Mesh{ Mesh::Vertices{ { 1.0, 1.0, 1.0 }, { 2.0, 3.0, 4.0 } }, Mesh::Faces{ { 0, 1, 2 }, { 3, 4, 5, 6 } } },
+                          Mesh{ Mesh::Vertices{ { 1.0, 1.0, 1.0 }, { 2.0, 3.0, 4.0 } }, Mesh::Faces{ { 0, 1, 2 }, { 3, 4, 5, 6 }, {} } },
+                          false },
+            MeshEquality{ Mesh{ Mesh::Vertices{ { 1.0, 1.0, 1.0 }, { 2.0, 3.0, 4.0 } }, Mesh::Faces{ { 0, 1, 2 }, { 3, 4, 5, 6 } } },
+                          Mesh{ Mesh::Vertices{ { 1.0, 1.0, 1.0 }, { 2.0, 3.0, 4.0 } }, Mesh::Faces{ { 0, 1, 2 }, { 3, 4, 5, 6 }, { 1 } } },
+                          false },
+            MeshEquality{ Mesh{ Mesh::Vertices{ { 1.0, 1.0, 1.0 }, { 2.0, 3.0, 4.0 } }, Mesh::Faces{ { 0, 1, 2 }, { 3, 4, 5, 6 } } },
+                          Mesh{ Mesh::Vertices{ { 1.0, 1.0, 1.0 }, { 2.0, 3.0, 4.0 } }, Mesh::Faces{ { 0, 1, 2 }, { 3, 4, 5, 7 } } },
+                          false },
+            MeshEquality{ Mesh{ Mesh::Vertices{ { 1.0, 1.0, 1.0 }, { 2.0, 3.0, 4.0 } }, Mesh::Faces{ { 0, 1, 2 }, { 3, 4, 5, 6 } } },
+                          Mesh{ Mesh::Vertices{ { 1.0, 1.0, 1.0 }, { 2.0, 3.0, 4.0 } }, Mesh::Faces{ { 0, 1, 2 }, { 3, 4, 5 }, {} } },
+                          false },
+
+            // case of different vertex buffers
+            MeshEquality{ Mesh{ Mesh::Vertices{ { 1.0, 1.0, 1.0 }, { 2.0, 3.0, 4.0 } }, Mesh::Faces{ { 0, 1, 2 }, { 3, 4, 5, 6 } } },
+                          Mesh{ Mesh::Vertices{ { 1.0, 1.0, 1.0 }, { 2.0, 3.0, 4.0 }, { 5.0, 5.0, 5.0 } }, Mesh::Faces{ { 0, 1, 2 }, { 3, 4, 5, 6 } } },
+                          false },
+            MeshEquality{ Mesh{ Mesh::Vertices{ { 1.0, 1.0, 1.0 }, { 2.0, 3.0, 4.0 } }, Mesh::Faces{ { 0, 1, 2 }, { 3, 4, 5, 6 } } },
+                          Mesh{ Mesh::Vertices{ { 1.0, 1.0, 1.0 }, { 4.0, 5.0, 6.0 } }, Mesh::Faces{ { 0, 1, 2 }, { 3, 4, 5, 6 } } },
+                          false },
+            MeshEquality{
+                Mesh{ Mesh::Vertices{ { 0.000000000001, 0.0, 0.0 } }, Mesh::Faces{} }, Mesh{ Mesh::Vertices{ { 0.0, 0.0, 0.0 } }, Mesh::Faces{} }, false }
+
+            ));
 
   }  // namespace core
 }  // namespace kinverse

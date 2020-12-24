@@ -32,6 +32,12 @@
 
 #include "stdafx.h"
 #include "../include/kinverse/core/mesh.h"
+#include <kinverse/math/math.h>
+
+kinverse::core::Mesh::Mesh(const Vertices& vertices, const Faces& faces) {
+  setVertices(vertices);
+  setFaces(faces);
+}
 
 unsigned long long kinverse::core::Mesh::getNumberOfVertices() const {
   return m_vertices.size();
@@ -41,18 +47,40 @@ unsigned long long kinverse::core::Mesh::getNumberOfFaces() const {
   return m_faces.size();
 }
 
-void kinverse::core::Mesh::setVertices(const std::vector<Eigen::Vector3d>& vertices) {
+void kinverse::core::Mesh::setVertices(const Vertices& vertices) {
   m_vertices = vertices;
 }
 
-std::vector<Eigen::Vector3d> kinverse::core::Mesh::getVertices() const {
+kinverse::core::Mesh::Vertices kinverse::core::Mesh::getVertices() const {
   return m_vertices;
 }
 
-void kinverse::core::Mesh::setFaces(const std::vector<std::vector<unsigned long long>>& faces) {
+void kinverse::core::Mesh::setFaces(const Faces& faces) {
   m_faces = faces;
 }
 
-std::vector<std::vector<unsigned long long>> kinverse::core::Mesh::getFaces() const {
+kinverse::core::Mesh::Faces kinverse::core::Mesh::getFaces() const {
   return m_faces;
+}
+
+bool kinverse::core::Mesh::operator==(const Mesh& rhs) const {
+  if (this->m_faces != rhs.m_faces)
+    return false;
+
+  if (this->m_vertices.size() != rhs.m_vertices.size())
+    return false;
+
+  const auto numberOfVertices = this->m_vertices.size();
+  for (auto vertexCounter = 0u; vertexCounter < numberOfVertices; ++vertexCounter) {
+    const Eigen::Vector3d& p1 = this->m_vertices[vertexCounter];
+    const Eigen::Vector3d& p2 = rhs.m_vertices[vertexCounter];
+    if (!math::pointsAreEqual(p1, p2))
+      return false;
+  }
+
+  return true;
+}
+
+bool kinverse::core::Mesh::operator!=(const Mesh& rhs) const {
+  return !(*this == rhs);
 }

@@ -168,5 +168,21 @@ namespace kinverse {
       double m_xAxisRotation{ 0.0 };
     };
 
+    /**
+     * @brief Equality operator for Denavit-Hartenberg parameters class.
+     * @param[in] lhs - left side object
+     * @param[in] rhs - right side object
+     * @return Returns true if objects are equal, false otherwise.
+     */
+    inline bool KINVERSE_CORE_API operator==(const DenavitHartenbergParameters& lhs, const DenavitHartenbergParameters& rhs);
+
+    /**
+     * @brief Inequality operator for Denavit-Hartenberg parameters class.
+     * @param[in] lhs - left side object
+     * @param[in] rhs - right side object
+     * @return Returns true if objects are not equal, false otherwise.
+     */
+    inline bool KINVERSE_CORE_API operator!=(const DenavitHartenbergParameters& lhs, const DenavitHartenbergParameters& rhs);
+
   }  // namespace core
 }  // namespace kinverse

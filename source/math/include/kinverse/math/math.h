@@ -80,5 +80,25 @@ namespace kinverse {
      */
     bool KINVERSE_MATH_API pointLiesOnLine(const Eigen::Vector3d& origin, const Eigen::Vector3d& direction, const Eigen::Vector3d& point);
 
+    /**
+     * @brief This method compares two double values using predefined epsilon value.
+     * This epsilon value defines accuracy of double comparisons.
+     * @param[in] lhs - first double value
+     * @param[in] rhs - second double value
+     * @return Returns true if two values are almost equal
+     * (distance between them is within predefined epsilon), false otherwise.
+     */
+    bool KINVERSE_MATH_API doublesAreEqual(double lhs, double rhs);
+
+    /**
+     * @brief This method checks whether two points are equal. In order to do that it computes distance between
+     * these points and checks if it is lower than predefined epsilon value.
+     * @param[in] p1 - first point
+     * @param[in] p2 - second point
+     * @return Returns true if two points are almost equal
+     * (distance between them is within predefined epsilon), false otherwise.
+     */
+    bool KINVERSE_MATH_API pointsAreEqual(const Eigen::Vector3d& p1, const Eigen::Vector3d& p2);
+
   }  // namespace math
 }  // namespace kinverse

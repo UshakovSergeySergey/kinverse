@@ -30,41 +30,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "stdafx.h"
-#include "../include/kinverse/math/math.h"
+#pragma once
 
-double kinverse::math::degreesToRadians(double angleInDegrees) {
-  constexpr double toRadians = M_PI / 180.0;
-  return angleInDegrees * toRadians;
-}
+#include "exports.h"
+#include "robot.h"
 
-double kinverse::math::radiansToDegrees(double angleInRadians) {
-  constexpr double toDegrees = 180.0 * M_1_PI;
-  return angleInRadians * toDegrees;
-}
+namespace kinverse {
+  namespace core {
 
-void kinverse::math::toXYZABC(const Eigen::Affine3d& transform, Eigen::Vector3d& xyz, Eigen::Vector3d& abc) {
-  xyz = transform.translation();
-  abc = Eigen::EulerAnglesZYXd(transform.rotation()).angles();
-}
+    class KINVERSE_CORE_API ForwardKinematicsSolver {
+     public:
+      ForwardKinematicsSolver(Robot::ConstPtr robot = nullptr);
+      Eigen::Affine3d solve(const Eigen::VectorXd& configuration) const;
 
-Eigen::Affine3d kinverse::math::fromXYZABC(const Eigen::Vector3d& xyz, const Eigen::Vector3d& abc) {
-  return Eigen::Translation3d(xyz) * Eigen::EulerAnglesZYXd(abc.x(), abc.y(), abc.z());
-}
+     private:
+      Robot::ConstPtr m_robot{ nullptr };
+    };
 
-bool kinverse::math::pointLiesOnLine(const Eigen::Vector3d& origin, const Eigen::Vector3d& direction, const Eigen::Vector3d& point) {
-  const Eigen::Vector3d p0 = origin;
-  const Eigen::Vector3d p1 = origin + direction;
-
-  const double squaredDistance = (point - p0).cross(point - p1).squaredNorm() / (p1 - p0).squaredNorm();
-
-  return (squaredDistance < 1.0e-6);
-}
-
-bool kinverse::math::doublesAreEqual(double lhs, double rhs) {
-  return std::abs(lhs - rhs) < 1.0e-14;
-}
-
-bool kinverse::math::pointsAreEqual(const Eigen::Vector3d& p1, const Eigen::Vector3d& p2) {
-  return (p1 - p2).squaredNorm() < 1.0e-14 * 1.0e-14;
-}
+  }  // namespace core
+}  // namespace kinverse

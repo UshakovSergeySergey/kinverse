@@ -32,7 +32,6 @@
 
 #include "stdafx.h"
 #include "test_denavit_hartenberg_parameters.h"
-#include <kinverse/core/denavit_hartenberg_parameters.h>
 
 namespace kinverse {
   namespace core {
@@ -85,6 +84,15 @@ namespace kinverse {
       EXPECT_DOUBLE_EQ(zAxisDisplacement, expectedZAxisDisplacement);
     }
 
+    TEST_F(TestDenavitHartenbergParameters, SetZAxisDisplacement_WhenDisplacementIsNotFinite_ThrowsException) {
+      // arrange
+      DenavitHartenbergParameters dhParameters;
+
+      // act assert
+      EXPECT_THROW(dhParameters.setZAxisDisplacement(std::numeric_limits<double>::quiet_NaN()), std::domain_error);
+      EXPECT_THROW(dhParameters.setZAxisDisplacement(std::numeric_limits<double>::infinity()), std::domain_error);
+    }
+
     TEST_F(TestDenavitHartenbergParameters, GetZAxisRotation_WhenDefaultConstructed_ReturnsZero) {
       // arrange
       DenavitHartenbergParameters dhParameters;
@@ -107,6 +115,15 @@ namespace kinverse {
 
       // assert
       EXPECT_DOUBLE_EQ(zAxisRotation, expectedZAxisRotation);
+    }
+
+    TEST_F(TestDenavitHartenbergParameters, SetZAxisRotation_WhenAngleIsNotFinite_ThrowsException) {
+      // arrange
+      DenavitHartenbergParameters dhParameters;
+
+      // act assert
+      EXPECT_THROW(dhParameters.setZAxisRotation(std::numeric_limits<double>::quiet_NaN()), std::domain_error);
+      EXPECT_THROW(dhParameters.setZAxisRotation(std::numeric_limits<double>::infinity()), std::domain_error);
     }
 
     TEST_F(TestDenavitHartenbergParameters, GetXAxisDisplacement_WhenDefaultConstructed_ReturnsZero) {
@@ -133,6 +150,15 @@ namespace kinverse {
       EXPECT_DOUBLE_EQ(xAxisDisplacement, expectedXAxisDisplacement);
     }
 
+    TEST_F(TestDenavitHartenbergParameters, SetXAxisDisplacement_WhenDisplacementIsNotFinite_ThrowsException) {
+      // arrange
+      DenavitHartenbergParameters dhParameters;
+
+      // act assert
+      EXPECT_THROW(dhParameters.setXAxisDisplacement(std::numeric_limits<double>::quiet_NaN()), std::domain_error);
+      EXPECT_THROW(dhParameters.setXAxisDisplacement(std::numeric_limits<double>::infinity()), std::domain_error);
+    }
+
     TEST_F(TestDenavitHartenbergParameters, GetXAxisRotation_WhenDefaultConstructed_ReturnsZero) {
       // arrange
       DenavitHartenbergParameters dhParameters;
@@ -155,6 +181,15 @@ namespace kinverse {
 
       // assert
       EXPECT_DOUBLE_EQ(xAxisRotation, expectedXAxisRotation);
+    }
+
+    TEST_F(TestDenavitHartenbergParameters, SetXAxisRotation_WhenAngleIsNotFinite_ThrowsException) {
+      // arrange
+      DenavitHartenbergParameters dhParameters;
+
+      // act assert
+      EXPECT_THROW(dhParameters.setXAxisRotation(std::numeric_limits<double>::quiet_NaN()), std::domain_error);
+      EXPECT_THROW(dhParameters.setXAxisRotation(std::numeric_limits<double>::infinity()), std::domain_error);
     }
 
     TEST_F(TestDenavitHartenbergParameters, GetTransform_IfJointTypeIsRevolute_ReturnsValidTransform) {
@@ -193,20 +228,14 @@ namespace kinverse {
       EXPECT_TRUE(transform.matrix().isApprox(expectedMatrix));
     };
 
-    TEST_F(TestDenavitHartenbergParameters, GetTransform_IfDHParametersAreNotFinite_ReturnsNonFiniteTransform) {
+    TEST_F(TestDenavitHartenbergParameters, GetTransform_WhenValueIsNotFinite_ThrowsException) {
       // arrange
-      DenavitHartenbergParameters dhParameters(JointType::Prismatic,
-                                               std::numeric_limits<double>::infinity(),
-                                               std::numeric_limits<double>::quiet_NaN(),
-                                               std::numeric_limits<double>::quiet_NaN(),
-                                               std::numeric_limits<double>::infinity());
+      DenavitHartenbergParameters dhParameters;
 
-      // act
-      const Eigen::Affine3d transform = dhParameters.getTransform();
-
-      // ASSERT
-      EXPECT_FALSE(transform.matrix().allFinite());
-    };
+      // act assert
+      EXPECT_THROW(dhParameters.getTransform(std::numeric_limits<double>::quiet_NaN()), std::domain_error);
+      EXPECT_THROW(dhParameters.getTransform(std::numeric_limits<double>::infinity()), std::domain_error);
+    }
 
     TEST_F(TestDenavitHartenbergParameters, GetTransformZ_IfJointTypeIsRevolute_ReturnsValidZPartOfTransform) {
       // arrange
@@ -244,6 +273,15 @@ namespace kinverse {
       EXPECT_TRUE(transform.matrix().isApprox(expectedMatrix));
     }
 
+    TEST_F(TestDenavitHartenbergParameters, GetTransformZ_WhenValueIsNotFinite_ThrowsException) {
+      // arrange
+      DenavitHartenbergParameters dhParameters;
+
+      // act assert
+      EXPECT_THROW(dhParameters.getTransformZ(std::numeric_limits<double>::quiet_NaN()), std::domain_error);
+      EXPECT_THROW(dhParameters.getTransformZ(std::numeric_limits<double>::infinity()), std::domain_error);
+    }
+
     TEST_F(TestDenavitHartenbergParameters, GetTransformX_ReturnsValidXPartOfTransform) {
       // arrange
       const double zAxisDisplacement = 100.0;
@@ -277,6 +315,32 @@ namespace kinverse {
 
       // assert
       EXPECT_TRUE(transform.isApprox(zTransform * xTransform));
+    }
+
+    TEST_P(TestDenavitHartenbergParameters, EqualityOperator_WorksCorrectly) {
+      // arrange
+      const auto lhs = std::get<0>(GetParam());
+      const auto rhs = std::get<1>(GetParam());
+      const bool expectedResult = std::get<2>(GetParam());
+
+      // act
+      const auto result = lhs == rhs;
+
+      // assert
+      EXPECT_EQ(result, expectedResult);
+    }
+
+    TEST_P(TestDenavitHartenbergParameters, InequalityOperator_WorksCorrectly) {
+      // arrange
+      const auto lhs = std::get<0>(GetParam());
+      const auto rhs = std::get<1>(GetParam());
+      const bool expectedResult = !std::get<2>(GetParam());
+
+      // act
+      const auto result = lhs != rhs;
+
+      // assert
+      EXPECT_EQ(result, expectedResult);
     }
 
   }  // namespace core

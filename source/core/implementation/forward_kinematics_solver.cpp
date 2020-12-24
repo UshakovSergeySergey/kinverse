@@ -31,40 +31,30 @@
  */
 
 #include "stdafx.h"
-#include "../include/kinverse/math/math.h"
+#include "../include/kinverse/core/forward_kinematics_solver.h"
+#include "../include/kinverse/core/robot.h"
 
-double kinverse::math::degreesToRadians(double angleInDegrees) {
-  constexpr double toRadians = M_PI / 180.0;
-  return angleInDegrees * toRadians;
+kinverse::core::ForwardKinematicsSolver::ForwardKinematicsSolver(Robot::ConstPtr robot) {
+  m_robot = robot;
 }
 
-double kinverse::math::radiansToDegrees(double angleInRadians) {
-  constexpr double toDegrees = 180.0 * M_1_PI;
-  return angleInRadians * toDegrees;
-}
+Eigen::Affine3d kinverse::core::ForwardKinematicsSolver::solve(const Eigen::VectorXd& configuration) const {
+  if (!configuration.allFinite())
+    throw std::domain_error("Failed to solve forward kinematics! Robot configuration must be finite vector!");
 
-void kinverse::math::toXYZABC(const Eigen::Affine3d& transform, Eigen::Vector3d& xyz, Eigen::Vector3d& abc) {
-  xyz = transform.translation();
-  abc = Eigen::EulerAnglesZYXd(transform.rotation()).angles();
-}
+  const auto numberOfJoints = m_robot->getNumberOfJoints();
+  if (configuration.rows() != numberOfJoints)
+    throw std::domain_error("Failed to solve forward kinematics! Number of axis values in configuration doesn't match number of robots joints!");
 
-Eigen::Affine3d kinverse::math::fromXYZABC(const Eigen::Vector3d& xyz, const Eigen::Vector3d& abc) {
-  return Eigen::Translation3d(xyz) * Eigen::EulerAnglesZYXd(abc.x(), abc.y(), abc.z());
-}
+  const auto dhTable = m_robot->getDHTable();
 
-bool kinverse::math::pointLiesOnLine(const Eigen::Vector3d& origin, const Eigen::Vector3d& direction, const Eigen::Vector3d& point) {
-  const Eigen::Vector3d p0 = origin;
-  const Eigen::Vector3d p1 = origin + direction;
+  Eigen::Affine3d endEffectorTransform = Eigen::Affine3d::Identity();
+  for (auto jointCounter = 0u; jointCounter < numberOfJoints; ++jointCounter) {
+    const auto& dhParameters = dhTable[jointCounter];
+    const double axisValue = configuration(jointCounter);
 
-  const double squaredDistance = (point - p0).cross(point - p1).squaredNorm() / (p1 - p0).squaredNorm();
+    endEffectorTransform = endEffectorTransform * dhParameters.getTransform(axisValue);
+  }
 
-  return (squaredDistance < 1.0e-6);
-}
-
-bool kinverse::math::doublesAreEqual(double lhs, double rhs) {
-  return std::abs(lhs - rhs) < 1.0e-14;
-}
-
-bool kinverse::math::pointsAreEqual(const Eigen::Vector3d& p1, const Eigen::Vector3d& p2) {
-  return (p1 - p2).squaredNorm() < 1.0e-14 * 1.0e-14;
+  return endEffectorTransform;
 }

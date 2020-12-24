@@ -32,7 +32,6 @@
 
 #include "stdafx.h"
 #include "test_mesh.h"
-#include <kinverse/core/mesh.h>
 
 namespace kinverse {
   namespace core {
@@ -162,6 +161,32 @@ namespace kinverse {
           EXPECT_EQ(face[indexCounter], expectedFace[indexCounter]);
         }
       }
+    }
+
+    TEST_P(TestMesh, EqualityOperator_WorksCorrectly) {
+      // arrange
+      const auto lhs = std::get<0>(GetParam());
+      const auto rhs = std::get<1>(GetParam());
+      const bool expectedResult = std::get<2>(GetParam());
+
+      // act
+      const auto result = lhs == rhs;
+
+      // assert
+      EXPECT_EQ(result, expectedResult);
+    }
+
+    TEST_P(TestMesh, InequalityOperator_WorksCorrectly) {
+      // arrange
+      const auto lhs = std::get<0>(GetParam());
+      const auto rhs = std::get<1>(GetParam());
+      const bool expectedResult = !std::get<2>(GetParam());
+
+      // act
+      const auto result = lhs != rhs;
+
+      // assert
+      EXPECT_EQ(result, expectedResult);
     }
 
   }  // namespace core

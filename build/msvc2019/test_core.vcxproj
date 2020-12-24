@@ -100,6 +100,8 @@
     </ClCompile>
     <ClCompile Include="..\..\source\test_core\test_analytical_solver.cpp" />
     <ClCompile Include="..\..\source\test_core\test_denavit_hartenberg_parameters.cpp" />
+    <ClCompile Include="..\..\source\test_core\test_forward_kinematics_solver.cpp" />
+    <ClCompile Include="..\..\source\test_core\test_joint_constraints.cpp" />
     <ClCompile Include="..\..\source\test_core\test_mesh.cpp" />
     <ClCompile Include="..\..\source\test_core\test_robot.cpp" />
   </ItemGroup>
@@ -107,6 +109,8 @@
     <ClInclude Include="..\..\source\test_core\stdafx.h" />
     <ClInclude Include="..\..\source\test_core\test_analytical_solver.h" />
     <ClInclude Include="..\..\source\test_core\test_denavit_hartenberg_parameters.h" />
+    <ClInclude Include="..\..\source\test_core\test_forward_kinematics_solver.h" />
+    <ClInclude Include="..\..\source\test_core\test_joint_constraints.h" />
     <ClInclude Include="..\..\source\test_core\test_mesh.h" />
     <ClInclude Include="..\..\source\test_core\test_robot.h" />
   </ItemGroup>

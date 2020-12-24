@@ -42,41 +42,26 @@ namespace kinverse {
 
     class KINVERSE_CORE_API Robot {
      public:
-      /**
-       * @brief Smart pointer to @p IRobot
-       */
       using Ptr = std::shared_ptr<Robot>;
-
-      /**
-       * @brief Smart pointer to const @p IRobot
-       */
       using ConstPtr = std::shared_ptr<const Robot>;
 
-      /**
-       * @brief Sets Denavit-Hartenberg table describing kinematic chain of the robot.
-       * @param[in] dhTable - Denavit-Hartenberg table
-       */
       void setDHTable(const std::vector<DenavitHartenbergParameters>& dhTable);
-
-      /**
-       * @brief Returns Denavit-Hartenberg table of the robot.
-       */
       std::vector<DenavitHartenbergParameters> getDHTable() const;
-
-      /**
-       * @brief Sets robots axes configuration.
-       * @param[in] configuration - axes configuration
-       */
-      void setConfiguration(const std::vector<double>& configuration);
-
-      /**
-       * @brief Returns current robot axes configuration.
-       */
-      std::vector<double> getConfiguration() const;
 
       void setJointConstraints(const std::vector<JointConstraints>& constraints);
       std::vector<JointConstraints> getJointConstraints() const;
 
+      void setMeshes(const std::vector<Mesh::ConstPtr>& meshes);
+      std::vector<Mesh::ConstPtr> getMeshes() const;
+
+      void setTransform(const Eigen::Affine3d& transform);
+      Eigen::Affine3d getTransform() const;
+
+      void setBaseTransform(const Eigen::Affine3d& transform);
+      Eigen::Affine3d getBaseTransform() const;
+
+      unsigned int getNumberOfJoints() const;
+      unsigned int getNumberOfLinks() const;
       /**
        * For example KUKA KR5 Arc has its first axis pointing down, if you'll build kinematic diagram for KUKA you'll see
        * that the whole robot seems to be upside down (end effector has negative z values).
@@ -86,26 +71,21 @@ namespace kinverse {
        * Base transform tells how we need to rotate and translate robot (its kinematic diagram) in order to get robots local coordinate frame.
        * Whether robot transform tells how is robot positioned and oriented in the world.
        */
-      void setBaseTransform(const Eigen::Affine3d& transform);
-      Eigen::Affine3d getBaseTransform() const;
 
-      void setTransform(const Eigen::Affine3d& transform);
-      Eigen::Affine3d getTransform() const;
-
-      void setMeshes(const std::vector<Mesh::ConstPtr>& meshes);
-      std::vector<Mesh::ConstPtr> getMeshes() const;
-
-      unsigned int getNumberOfJoints() const;
-      unsigned int getNumberOfLinks() const;
+      void setConfiguration(const std::vector<double>& configuration);
+      std::vector<double> getConfiguration() const;
 
       std::vector<Eigen::Affine3d> getJointCoordinateFrames() const;
       std::vector<Eigen::Affine3d> getLinkCoordinateFrames() const;
+      Eigen::Affine3d getEndEffectorTransform() const;
+
+      bool isValid() const;
 
      private:
       std::vector<double> getAxisValues(const std::vector<double>& axisValues) const;
 
       Eigen::Affine3d m_baseTransform{ Eigen::Affine3d::Identity() };
-
+      Eigen::Affine3d m_transform{ Eigen::Affine3d::Identity() };
       std::vector<DenavitHartenbergParameters> m_dhTable{};
       std::vector<JointConstraints> m_constraints{};
       std::vector<double> m_configuration{};

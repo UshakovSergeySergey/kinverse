@@ -44,6 +44,16 @@ namespace kinverse {
     class KINVERSE_CORE_API Mesh {
      public:
       /**
+       * @brief Short alias for vertex buffer array
+       */
+      using Vertices = std::vector<Eigen::Vector3d>;
+
+      /**
+       * @brief Short alias for index buffer array
+       */
+      using Faces = std::vector<std::vector<unsigned long long>>;
+
+      /**
        * @brief Smart pointer to @p Mesh
        */
       using Ptr = std::shared_ptr<Mesh>;
@@ -52,6 +62,13 @@ namespace kinverse {
        * @brief Smart pointer to const @p Mesh
        */
       using ConstPtr = std::shared_ptr<const Mesh>;
+
+      /**
+       * @brief Simple constructor for mesh creation.
+       * @param[in] vertices - vertex buffer
+       * @param[in] faces - index buffer
+       */
+      explicit Mesh(const Vertices& vertices = {}, const Faces& faces = {});
 
       /**
        * @brief Returns number of vertices.
@@ -67,34 +84,48 @@ namespace kinverse {
        * @brief Sets vertices.
        * @param[in] vertices - mesh vertices
        */
-      void setVertices(const std::vector<Eigen::Vector3d>& vertices);
+      void setVertices(const Vertices& vertices);
 
       /**
        * @brief Returns mesh vertices.
        */
-      std::vector<Eigen::Vector3d> getVertices() const;
+      Vertices getVertices() const;
 
       /**
        * @brief Sets mesh faces. Note that face is not necessarily a triangle. It can have as many vertices as you want.
        * @param[in] faces - mesh faces
        */
-      void setFaces(const std::vector<std::vector<unsigned long long>>& faces);
+      void setFaces(const Faces& faces);
 
       /**
        * @brief Returns mesh faces.
        */
-      std::vector<std::vector<unsigned long long>> getFaces() const;
+      Faces getFaces() const;
+
+      /**
+       * @brief Equality operator for Mesh objects.
+       * @param[in] rhs - right side object
+       * @return Returns true if objects are equal, false otherwise.
+       */
+      bool operator==(const Mesh& rhs) const;
+
+      /**
+       * @brief Inequality operator for Mesh objects.
+       * @param[in] rhs - right side object
+       * @return Returns true if objects are not equal, false otherwise.
+       */
+      bool operator!=(const Mesh& rhs) const;
 
      private:
       /**
        * @brief Stores mesh vertices.
        */
-      std::vector<Eigen::Vector3d> m_vertices{};
+      Vertices m_vertices{};
 
       /**
        * @brief Stores mesh faces. Note that face is not necessarily a triangle. It can have as many vertices as you want.
        */
-      std::vector<std::vector<unsigned long long>> m_faces{};
+      Faces m_faces{};
     };
 
   }  // namespace core

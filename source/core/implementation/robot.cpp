@@ -136,6 +136,8 @@ std::vector<double> kinverse::core::Robot::getAxisValues(const std::vector<doubl
 }
 
 void kinverse::core::Robot::setBaseTransform(const Eigen::Affine3d& transform) {
+  if (!transform.matrix().allFinite())
+    throw std::domain_error("Failed to set base transform! All values of the transform matrix must be finite numbers!");
   m_baseTransform = transform;
 }
 
@@ -149,4 +151,18 @@ void kinverse::core::Robot::setMeshes(const std::vector<Mesh::ConstPtr>& meshes)
 
 std::vector<kinverse::core::Mesh::ConstPtr> kinverse::core::Robot::getMeshes() const {
   return m_meshes;
+}
+
+void kinverse::core::Robot::setTransform(const Eigen::Affine3d& transform) {
+  if (!transform.matrix().allFinite())
+    throw std::domain_error("Failed to set transform! All values of the transform matrix must be finite numbers!");
+  m_transform = transform;
+}
+
+Eigen::Affine3d kinverse::core::Robot::getTransform() const {
+  return m_transform;
+}
+
+Eigen::Affine3d kinverse::core::Robot::getEndEffectorTransform() const {
+  return getLinkCoordinateFrames().back();
 }

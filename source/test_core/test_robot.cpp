@@ -32,33 +32,236 @@
 
 #include "stdafx.h"
 #include "test_robot.h"
+#include <kinverse/core/robot.h>
+#include <kinverse/core/denavit_hartenberg_parameters.h>
 
 namespace kinverse {
-  namespace core {}
+  namespace core {
+
+    TEST_F(TestRobot, GetDHTable_WhenDefaultConstructed_ReturnsEmptyTable) {
+      // arrange
+      const auto robot = std::make_shared<Robot>();
+
+      // act
+      const auto dhTable = robot->getDHTable();
+
+      // assert
+      EXPECT_TRUE(dhTable.empty());
+    }
+
+    TEST_F(TestRobot, GetDHTable_WhenDHTableIsSet_ReturnsProvidedDHTable) {
+      // arrange
+      const std::vector<DenavitHartenbergParameters> expectedDHTable{
+        { JointType::Prismatic, 123.234, 89.2349, 98734.10900347, 239487.12 },  //
+        { JointType::Revolute, 34.1234, 2343.3457, 787.232, 9789.2343 },        //
+        { JointType::Revolute, 54.0173, 95.03921, 34.340019, 132.048727 }       //
+      };
+
+      const auto robot = std::make_shared<Robot>();
+      robot->setDHTable(expectedDHTable);
+
+      // act
+      const auto dhTable = robot->getDHTable();
+
+      // assert
+      ASSERT_EQ(dhTable.size(), expectedDHTable.size());
+      for (auto rowCounter = 0u; rowCounter < dhTable.size(); ++rowCounter) {
+        EXPECT_EQ(dhTable[rowCounter], expectedDHTable[rowCounter]);
+      }
+    }
+
+    TEST_F(TestRobot, GetJointConstraints_WhenDefaultConstructed_ReturnsEmptyListOfConstraints) {
+      // arrange
+      const auto robot = std::make_shared<Robot>();
+
+      // act
+      const auto constraints = robot->getJointConstraints();
+
+      // assert
+      EXPECT_TRUE(constraints.empty());
+    }
+
+    TEST_F(TestRobot, GetJointConstraints_WhenJointConstraintsAreSet_ReturnsProvidedJointConstraints) {
+      // arrange
+      const std::vector<JointConstraints> expectedConstraints{
+        JointConstraints{ 23.092, -234.0032, 552.82 },      //
+        JointConstraints{ 54.0345, 34.1983498, 544.892 },   //
+        JointConstraints{ 343.0943, 3095.08934, 891.9834 }  //
+      };
+
+      const auto robot = std::make_shared<Robot>();
+      robot->setJointConstraints(expectedConstraints);
+
+      // act
+      const auto constraints = robot->getJointConstraints();
+
+      // assert
+      ASSERT_EQ(constraints.size(), expectedConstraints.size());
+      for (auto jointCounter = 0u; jointCounter < constraints.size(); ++jointCounter) {
+        EXPECT_EQ(constraints[jointCounter], expectedConstraints[jointCounter]);
+      }
+    }
+
+    TEST_F(TestRobot, GetMeshes_WhenDefaultConstructed_ReturnsEmptyListOfMeshes) {
+      // arrange
+      const auto robot = std::make_shared<Robot>();
+
+      // act
+      const auto meshes = robot->getMeshes();
+
+      // assert
+      EXPECT_TRUE(meshes.empty());
+    }
+
+    TEST_F(TestRobot, GetMeshes_WhenMeshesAreSet_ReturnsProvidedMeshList) {
+      // arrange
+      const std::vector<Mesh::ConstPtr> expectedMeshes{
+        std::make_shared<Mesh>(Mesh::Vertices{ { 0.0, 0.0, 0.0 } }, Mesh::Faces{}),               //
+        std::make_shared<Mesh>(Mesh::Vertices{ { 1.0, 2.0, 3.0 } }, Mesh::Faces{ { 0, 1, 2 } }),  //
+        std::make_shared<Mesh>(Mesh::Vertices{}, Mesh::Faces{ { 3, 7, 1 } })                      //
+      };
+
+      const auto robot = std::make_shared<Robot>();
+      robot->setMeshes(expectedMeshes);
+
+      // act
+      const auto meshes = robot->getMeshes();
+
+      // assert
+      ASSERT_EQ(meshes.size(), expectedMeshes.size());
+      for (auto meshCounter = 0u; meshCounter < meshes.size(); ++meshCounter) {
+        EXPECT_EQ(meshes[meshCounter], expectedMeshes[meshCounter]);
+        EXPECT_EQ(*meshes[meshCounter], *expectedMeshes[meshCounter]);
+      }
+    }
+
+    TEST_F(TestRobot, GetTransform_WhenDefaultConstructed_ReturnsIdentityTransform) {
+      // arrange
+      const auto robot = std::make_shared<Robot>();
+
+      // act
+      const auto transform = robot->getTransform();
+
+      // assert
+      EXPECT_TRUE(transform.isApprox(Eigen::Affine3d::Identity()));
+    }
+
+    TEST_F(TestRobot, GetTransform_WhenTransformIsSet_ReturnsProvidedTransform) {
+      // arrange
+      const Eigen::Affine3d expectedTransform = Eigen::Translation3d(Eigen::Vector3d::Random()) * Eigen::Quaterniond::UnitRandom();
+
+      const auto robot = std::make_shared<Robot>();
+      robot->setTransform(expectedTransform);
+
+      // act
+      const auto transform = robot->getTransform();
+
+      // assert
+      EXPECT_TRUE(transform.isApprox(expectedTransform));
+    }
+
+    TEST_F(TestRobot, SetTransform_WhenTransformIsNotFinite_ThrowsException) {
+      // arrange
+      const Eigen::Affine3d transform = Eigen::Translation3d(std::numeric_limits<double>::quiet_NaN(), 0.0, 0.0) *
+                                        Eigen::AngleAxisd(std::numeric_limits<double>::infinity(), Eigen::Vector3d::UnitZ());
+      const auto robot = std::make_shared<Robot>();
+
+      // act assert
+      EXPECT_THROW(robot->setTransform(transform), std::domain_error);
+    }
+
+    TEST_F(TestRobot, GetBaseTransform_WhenDefaultConstructed_ReturnsIdentityTransform) {
+      // arrange
+      const auto robot = std::make_shared<Robot>();
+
+      // act
+      const auto transform = robot->getBaseTransform();
+
+      // assert
+      EXPECT_TRUE(transform.isApprox(Eigen::Affine3d::Identity()));
+    }
+
+    TEST_F(TestRobot, GetBaseTransform_WhenBaseTransformIsSet_ReturnsProvidedTransform) {
+      // arrange
+      const Eigen::Affine3d expectedTransform = Eigen::Translation3d(Eigen::Vector3d::Random()) * Eigen::Quaterniond::UnitRandom();
+
+      const auto robot = std::make_shared<Robot>();
+      robot->setBaseTransform(expectedTransform);
+
+      // act
+      const auto transform = robot->getBaseTransform();
+
+      // assert
+      EXPECT_TRUE(transform.isApprox(expectedTransform));
+    }
+
+    TEST_F(TestRobot, SetBaseTransform_WhenBaseTransformIsNotFinite_ThrowsException) {
+      // arrange
+      const Eigen::Affine3d transform = Eigen::Translation3d(std::numeric_limits<double>::quiet_NaN(), 0.0, 0.0) *
+                                        Eigen::AngleAxisd(std::numeric_limits<double>::infinity(), Eigen::Vector3d::UnitZ());
+      const auto robot = std::make_shared<Robot>();
+
+      // act assert
+      EXPECT_THROW(robot->setBaseTransform(transform), std::domain_error);
+    }
+
+    TEST_F(TestRobot, GetNumberOfJoints_WhenDefaultConstructed_ReturnsZero) {
+      // arrange
+      const auto robot = std::make_shared<Robot>();
+
+      // act
+      const auto numberOfJoints = robot->getNumberOfJoints();
+
+      // assert
+      EXPECT_EQ(numberOfJoints, 0);
+    }
+
+    TEST_F(TestRobot, GetNumberOfJoints_WhenDHTableIsSet_ReturnsNumberOfRowsInDHTable) {
+      // arrange
+      const std::vector<DenavitHartenbergParameters> dhTable{
+        { JointType::Prismatic, 123.234, 89.2349, 98734.10900347, 239487.12 },  //
+        { JointType::Revolute, 34.1234, 2343.3457, 787.232, 9789.2343 },        //
+        { JointType::Revolute, 54.0173, 95.03921, 34.340019, 132.048727 }       //
+      };
+
+      const auto robot = std::make_shared<Robot>();
+      robot->setDHTable(dhTable);
+
+      // act
+      const auto numberOfJoints = robot->getNumberOfJoints();
+
+      // assert
+      EXPECT_EQ(numberOfJoints, dhTable.size());
+    }
+
+    TEST_F(TestRobot, GetNumberOfLinks_WhenDefaultConstructed_ReturnsOne) {
+      // arrange
+      const auto robot = std::make_shared<Robot>();
+
+      // act
+      const auto numberOfLinks = robot->getNumberOfLinks();
+
+      // assert
+      EXPECT_EQ(numberOfLinks, 1);
+    }
+
+    TEST_F(TestRobot, GetNumberOfLinks_WhenDHTableIsSet_ReturnsNumberOfRowsInDHTablePlusOne) {
+      // arrange
+      const std::vector<DenavitHartenbergParameters> dhTable{
+        { JointType::Prismatic, 123.234, 89.2349, 98734.10900347, 239487.12 },  //
+        { JointType::Revolute, 34.1234, 2343.3457, 787.232, 9789.2343 },        //
+        { JointType::Revolute, 54.0173, 95.03921, 34.340019, 132.048727 }       //
+      };
+
+      const auto robot = std::make_shared<Robot>();
+      robot->setDHTable(dhTable);
+
+      // act
+      const auto numberOfLinks = robot->getNumberOfLinks();
+
+      // assert
+      EXPECT_EQ(numberOfLinks, dhTable.size() + 1);
+    }
+
+  }  // namespace core
 }  // namespace kinverse
-
-/*
-void setDHTable(const std::vector<DenavitHartenbergParameters>& dhTable);
-std::vector<DenavitHartenbergParameters> getDHTable() const;
-void setConfiguration(const std::vector<double>& configuration);
-std::vector<double> getConfiguration() const;
-void setJointConstraints(const std::vector<JointConstraints>& constraints);
-std::vector<JointConstraints> getJointConstraints() const;
-void setBaseTransform(const Eigen::Affine3d& transform);
-Eigen::Affine3d getBaseTransform() const;
-void setTransform(const Eigen::Affine3d& transform);
-Eigen::Affine3d getTransform() const;
-void setMeshes(const std::vector<Mesh::ConstPtr>& meshes);
-std::vector<Mesh::ConstPtr> getMeshes() const;
-unsigned int getNumberOfJoints() const;
-unsigned int getNumberOfLinks() const;
-std::vector<Eigen::Affine3d> getJointCoordinateFrames() const;
-std::vector<Eigen::Affine3d> getLinkCoordinateFrames() const;
-std::vector<double> getAxisValues(const std::vector<double>& axisValues) const;
-
-Eigen::Affine3d m_baseTransform{ Eigen::Affine3d::Identity() };
-std::vector<DenavitHartenbergParameters> m_dhTable{};
-std::vector<JointConstraints> m_constraints{};
-std::vector<double> m_configuration{};
-std::vector<Mesh::ConstPtr> m_meshes{};
-*/
