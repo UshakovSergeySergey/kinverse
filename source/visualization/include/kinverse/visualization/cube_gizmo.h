@@ -68,9 +68,9 @@ namespace kinverse {
        */
       explicit CubeGizmo(const IGizmo* parentGizmo = nullptr,
                          const Eigen::Affine3d& transform = Eigen::Affine3d::Identity(),
-                         double width = 300.0,
-                         double height = 300.0,
-                         double depth = 300.0,
+                         double width = 100.0,
+                         double height = 100.0,
+                         double depth = 100.0,
                          const Color& color = { 255, 255, 255, 255 });
 
       /**

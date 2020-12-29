@@ -141,6 +141,13 @@ namespace kinverse {
        */
       Eigen::Affine3d getTransformX() const;
 
+      /**
+       * @brief This method computes rotation about Z axis in case of revolute joint, or
+       * translation along Z axis in case of prismatic joint.
+       * @param[in] value - joint axis value
+       */
+      Eigen::Affine3d getJointTransform(double value = 0.0) const;
+
      private:
       /**
        * @brief Stores type of joint described by Denavit-Hartenberg parameters.

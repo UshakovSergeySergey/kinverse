@@ -32,6 +32,7 @@
 
 #include "stdafx.h"
 #include "../include/kinverse/core/robot.h"
+#include "../include/kinverse/core/forward_kinematics_solver.h"
 
 void kinverse::core::Robot::setDHTable(const std::vector<DenavitHartenbergParameters>& dhTable) {
   m_dhTable = dhTable;
@@ -47,102 +48,6 @@ void kinverse::core::Robot::setJointConstraints(const std::vector<JointConstrain
 
 std::vector<kinverse::core::JointConstraints> kinverse::core::Robot::getJointConstraints() const {
   return m_constraints;
-}
-
-void kinverse::core::Robot::setConfiguration(const std::vector<double>& configuration) {
-  m_configuration = std::vector<double>(configuration.size(), 0.0);
-  for (auto jointCounter = 0u; jointCounter < m_constraints.size(); ++jointCounter) {
-    const double clampedAngle = m_constraints[jointCounter].clampAxisValue(configuration[jointCounter]);
-    m_configuration[jointCounter] = clampedAngle;
-  }
-}
-
-std::vector<double> kinverse::core::Robot::getConfiguration() const {
-  return getAxisValues(m_configuration);
-}
-
-unsigned int kinverse::core::Robot::getNumberOfJoints() const {
-  return static_cast<unsigned int>(m_dhTable.size());
-}
-
-unsigned int kinverse::core::Robot::getNumberOfLinks() const {
-  return getNumberOfJoints() + 1;
-}
-
-std::vector<Eigen::Affine3d> kinverse::core::Robot::getJointCoordinateFrames() const {
-  const auto axisValues = getAxisValues(m_configuration);
-
-  std::vector<Eigen::Affine3d> frames{};
-
-  Eigen::Affine3d transform = m_baseTransform;
-  for (auto jointCounter = 0u; jointCounter < getNumberOfJoints(); jointCounter++) {
-    const auto& dhParameters = m_dhTable[jointCounter];
-    const double axisValue = axisValues[jointCounter];
-
-    Eigen::Affine3d jointTransform;
-    if (dhParameters.getJointType() == JointType::Revolute)
-      jointTransform = Eigen::AngleAxisd(axisValue, Eigen::Vector3d::UnitZ());
-    else
-      jointTransform = Eigen::Translation3d(0.0, 0.0, axisValue);
-
-    const Eigen::Affine3d currentTransform = transform * jointTransform;
-    frames.push_back(currentTransform);
-
-    transform = transform * dhParameters.getTransform(axisValue);
-  }
-
-  return frames;
-}
-
-std::vector<Eigen::Affine3d> kinverse::core::Robot::getLinkCoordinateFrames() const {
-  // Number of links is always equal to number of joints + 1
-  // The first link (also known as base frame or inertial frame) is always the origin.
-  // The last link is the end-effector.
-
-  const auto axisValues = getAxisValues(m_configuration);
-
-  std::vector<Eigen::Affine3d> frames{};
-
-  Eigen::Affine3d transform = m_baseTransform;
-
-  frames.push_back(transform);
-
-  for (auto jointCounter = 0u; jointCounter < getNumberOfJoints(); jointCounter++) {
-    const auto& dhParameters = m_dhTable[jointCounter];
-    const double axisValue = axisValues[jointCounter];
-
-    const Eigen::Affine3d currentTransform = dhParameters.getTransform(axisValue);
-    transform = transform * currentTransform;
-    frames.push_back(transform);
-  }
-
-  return frames;
-}
-
-std::vector<double> kinverse::core::Robot::getAxisValues(const std::vector<double>& axisValues) const {
-  if (axisValues.empty()) {
-    // if empty vector was provided then assume zero configuration
-    return std::vector<double>(getNumberOfJoints(), 0.0);
-  }
-
-  // otherwise check that number of joints and values matches
-  if (axisValues.size() != m_dhTable.size()) {
-    std::stringstream ss;
-    ss << "Robot has " << getNumberOfJoints() << " joints, but only " << axisValues.size() << " axis values were given!";
-    throw std::invalid_argument(ss.str());
-  }
-
-  return axisValues;
-}
-
-void kinverse::core::Robot::setBaseTransform(const Eigen::Affine3d& transform) {
-  if (!transform.matrix().allFinite())
-    throw std::domain_error("Failed to set base transform! All values of the transform matrix must be finite numbers!");
-  m_baseTransform = transform;
-}
-
-Eigen::Affine3d kinverse::core::Robot::getBaseTransform() const {
-  return m_baseTransform;
 }
 
 void kinverse::core::Robot::setMeshes(const std::vector<Mesh::ConstPtr>& meshes) {
@@ -163,6 +68,57 @@ Eigen::Affine3d kinverse::core::Robot::getTransform() const {
   return m_transform;
 }
 
+void kinverse::core::Robot::setBaseTransform(const Eigen::Affine3d& transform) {
+  if (!transform.matrix().allFinite())
+    throw std::domain_error("Failed to set base transform! All values of the transform matrix must be finite numbers!");
+  m_baseTransform = transform;
+}
+
+Eigen::Affine3d kinverse::core::Robot::getBaseTransform() const {
+  return m_baseTransform;
+}
+
+void kinverse::core::Robot::setTCPTransform(const Eigen::Affine3d& transform) {
+  if (!transform.matrix().allFinite())
+    throw std::domain_error("Failed to set tcp transform! All values of the transform matrix must be finite numbers!");
+  m_tcpTransform = transform;
+}
+
+Eigen::Affine3d kinverse::core::Robot::getTCPTransform() const {
+  return m_tcpTransform;
+}
+
+void kinverse::core::Robot::setConfiguration(const Eigen::VectorXd& configuration) {
+  if (configuration.rows() != getNumberOfJoints())
+    throw std::domain_error("Failed to set robot configuration! Configuration doesn't match number of joints! Number of joints is " +
+                            std::to_string(getNumberOfJoints()) + ", but configuration has only " + std::to_string(configuration.rows()) + " values!");
+
+  if (configuration.allFinite() == false)
+    throw std::domain_error("Failed to set robot configuration! All values of the configuration vector must be finite numbers!");
+
+  m_configuration = configuration;
+
+  if (!m_fkSolver) {
+    m_fkSolver = std::make_shared<ForwardKinematicsSolver>();
+    m_fkSolver->setRobot(shared_from_this());
+  }
+
+  m_endEffectorTransform = m_fkSolver->solve(configuration);
+  m_linkCoordinateFrames = m_fkSolver->getLinkCoordinateFrames();
+}
+
+Eigen::VectorXd kinverse::core::Robot::getConfiguration() const {
+  return m_configuration;
+}
+
+unsigned int kinverse::core::Robot::getNumberOfJoints() const {
+  return static_cast<unsigned int>(m_dhTable.size());
+}
+
 Eigen::Affine3d kinverse::core::Robot::getEndEffectorTransform() const {
-  return getLinkCoordinateFrames().back();
+  return m_endEffectorTransform;
+}
+
+std::vector<Eigen::Affine3d> kinverse::core::Robot::getLinkCoordinateFrames() const {
+  return m_linkCoordinateFrames;
 }

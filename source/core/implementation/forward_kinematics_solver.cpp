@@ -35,10 +35,21 @@
 #include "../include/kinverse/core/robot.h"
 
 kinverse::core::ForwardKinematicsSolver::ForwardKinematicsSolver(Robot::ConstPtr robot) {
+  setRobot(robot);
+}
+
+void kinverse::core::ForwardKinematicsSolver::setRobot(Robot::ConstPtr robot) {
   m_robot = robot;
 }
 
-Eigen::Affine3d kinverse::core::ForwardKinematicsSolver::solve(const Eigen::VectorXd& configuration) const {
+kinverse::core::Robot::ConstPtr kinverse::core::ForwardKinematicsSolver::getRobot() const {
+  return m_robot;
+}
+
+Eigen::Affine3d kinverse::core::ForwardKinematicsSolver::solve(const Eigen::VectorXd& configuration) {
+  if (!m_robot)
+    throw std::domain_error("Failed to solve forward kinematics! Robot is nullptr!");
+
   if (!configuration.allFinite())
     throw std::domain_error("Failed to solve forward kinematics! Robot configuration must be finite vector!");
 
@@ -48,13 +59,36 @@ Eigen::Affine3d kinverse::core::ForwardKinematicsSolver::solve(const Eigen::Vect
 
   const auto dhTable = m_robot->getDHTable();
 
-  Eigen::Affine3d endEffectorTransform = Eigen::Affine3d::Identity();
+  const auto numberOfLinks = 3 + numberOfJoints;
+  if (m_linkCoordinateFrames.size() != numberOfLinks)
+    m_linkCoordinateFrames.resize(numberOfLinks);
+
+  Eigen::Affine3d endEffectorTransform = m_robot->getTransform() * m_robot->getBaseTransform();
+
+  // set link to base coordinate frame
+  m_linkCoordinateFrames[0] = m_robot->getTransform();
+
   for (auto jointCounter = 0u; jointCounter < numberOfJoints; ++jointCounter) {
     const auto& dhParameters = dhTable[jointCounter];
     const double axisValue = configuration(jointCounter);
 
+    // set link to joint coordinate frame
+    m_linkCoordinateFrames[jointCounter + 1] = endEffectorTransform;
+
     endEffectorTransform = endEffectorTransform * dhParameters.getTransform(axisValue);
   }
 
+  // set link to flange coordinate frame
+  m_linkCoordinateFrames[numberOfLinks - 2] = endEffectorTransform;
+
+  endEffectorTransform = endEffectorTransform * m_robot->getTCPTransform();
+
+  // set link to tcp coordinate frame
+  m_linkCoordinateFrames[numberOfLinks - 1] = endEffectorTransform;
+
   return endEffectorTransform;
+}
+
+std::vector<Eigen::Affine3d> kinverse::core::ForwardKinematicsSolver::getLinkCoordinateFrames() const {
+  return m_linkCoordinateFrames;
 }

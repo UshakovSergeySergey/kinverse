@@ -34,6 +34,7 @@
 #include "test_robot.h"
 #include <kinverse/core/robot.h>
 #include <kinverse/core/denavit_hartenberg_parameters.h>
+#include <kinverse/math/math.h>
 
 namespace kinverse {
   namespace core {
@@ -131,7 +132,6 @@ namespace kinverse {
       ASSERT_EQ(meshes.size(), expectedMeshes.size());
       for (auto meshCounter = 0u; meshCounter < meshes.size(); ++meshCounter) {
         EXPECT_EQ(meshes[meshCounter], expectedMeshes[meshCounter]);
-        EXPECT_EQ(*meshes[meshCounter], *expectedMeshes[meshCounter]);
       }
     }
 
@@ -205,6 +205,136 @@ namespace kinverse {
       EXPECT_THROW(robot->setBaseTransform(transform), std::domain_error);
     }
 
+    TEST_F(TestRobot, GetTCPTransform_WhenDefaultConstructed_ReturnsIdentityTransform) {
+      // arrange
+      const auto robot = std::make_shared<Robot>();
+
+      // act
+      const Eigen::Affine3d tcpTransform = robot->getTCPTransform();
+
+      // assert
+      EXPECT_TRUE(tcpTransform.isApprox(Eigen::Affine3d::Identity()));
+    }
+
+    TEST_F(TestRobot, GetTCPTransform_WhenTCPTransformIsSet_ReturnsProvidedTransform) {
+      // arrange
+      const Eigen::Affine3d expectedTransform = Eigen::Translation3d(Eigen::Vector3d::Random()) * Eigen::Quaterniond::UnitRandom();
+
+      const auto robot = std::make_shared<Robot>();
+      robot->setTCPTransform(expectedTransform);
+
+      // act
+      const auto tcpTransform = robot->getTCPTransform();
+
+      // assert
+      EXPECT_TRUE(tcpTransform.isApprox(expectedTransform));
+    }
+
+    TEST_F(TestRobot, SetTCPTransform_WhenTCPTransformIsNotFinite_ThrowsException) {
+      // arrange
+      const Eigen::Affine3d transform = Eigen::Translation3d(std::numeric_limits<double>::quiet_NaN(), 0.0, 0.0) *
+                                        Eigen::AngleAxisd(std::numeric_limits<double>::infinity(), Eigen::Vector3d::UnitZ());
+      const auto robot = std::make_shared<Robot>();
+
+      // act assert
+      EXPECT_THROW(robot->setTCPTransform(transform), std::domain_error);
+    }
+
+    TEST_F(TestRobot, SetConfiguration_WhenConfigurationDoesntMatchNumberOfJoints_ThrowsException) {
+      // arrange
+      const std::vector<DenavitHartenbergParameters> dhTable{ DenavitHartenbergParameters{}, DenavitHartenbergParameters{} };
+      const auto robot = std::make_shared<Robot>();
+      robot->setDHTable(dhTable);
+
+      Eigen::VectorXd configuration(3);
+      configuration << 0.0, 1.0, 2.0;
+
+      // act assert
+      EXPECT_THROW(robot->setConfiguration(configuration), std::domain_error);
+    }
+
+    TEST_F(TestRobot, SetConfiguration_WhenConfigurationIsNotFinite_ThrowsException) {
+      // arrange
+      const std::vector<DenavitHartenbergParameters> dhTable{ DenavitHartenbergParameters{}, DenavitHartenbergParameters{} };
+      const auto robot = std::make_shared<Robot>();
+      robot->setDHTable(dhTable);
+
+      Eigen::VectorXd configuration(2);
+      configuration << std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::infinity();
+
+      // act assert
+      EXPECT_THROW(robot->setConfiguration(configuration), std::domain_error);
+    }
+
+    TEST_F(TestRobot, SetConfiguration_WhenConfigurationIsSet_UpdatesEndEffectorTransform) {
+      // arrange
+      const std::vector<DenavitHartenbergParameters> dhTable{
+        DenavitHartenbergParameters{ JointType::Revolute, 0.0, 0.0, 100.0, -M_PI_2 },        //
+        DenavitHartenbergParameters{ JointType::Prismatic, 200.0, -M_PI_2, 300.0, -M_PI_2 }  //
+      };
+
+      Eigen::VectorXd configuration(2);
+      configuration << M_PI_2, 0.0;
+
+      const Eigen::Affine3d expectedEndEffectorTransform = math::fromXYZABC(Eigen::Vector3d(-200.0, 100.0, 300.0), Eigen::Vector3d(M_PI_2, -M_PI_2, M_PI));
+
+      const auto robot = std::make_shared<Robot>();
+      robot->setDHTable(dhTable);
+      robot->setConfiguration(configuration);
+
+      // act
+      const auto endEffectorTransform = robot->getEndEffectorTransform();
+
+      // assert
+      EXPECT_TRUE(endEffectorTransform.isApprox(expectedEndEffectorTransform));
+    }
+
+    TEST_F(TestRobot, SetConfiguration_WhenConfigurationIsSet_UpdatesListOfLinkTransforms) {
+      // arrange
+      const std::vector<DenavitHartenbergParameters> dhTable{
+        DenavitHartenbergParameters{ JointType::Revolute, 0.0, 0.0, 100.0, -M_PI_2 },        //
+        DenavitHartenbergParameters{ JointType::Prismatic, 200.0, -M_PI_2, 300.0, -M_PI_2 }  //
+      };
+
+      Eigen::VectorXd configuration(2);
+      configuration << M_PI_2, 0.0;
+
+      const Eigen::Affine3d expectedEndEffectorTransform = math::fromXYZABC(Eigen::Vector3d(-200.0, 100.0, 300.0), Eigen::Vector3d(M_PI_2, -M_PI_2, M_PI));
+
+      const auto robot = std::make_shared<Robot>();
+      robot->setDHTable(dhTable);
+      robot->setConfiguration(configuration);
+
+      // act
+      const auto linkCoordinateFrames = robot->getLinkCoordinateFrames();
+
+      // assert
+      ASSERT_EQ(linkCoordinateFrames.size(), 5);
+      EXPECT_TRUE(linkCoordinateFrames[0].isApprox(Eigen::Affine3d::Identity()));  // base
+      // skip a1
+      // skip a2
+      EXPECT_TRUE(linkCoordinateFrames[3].isApprox(expectedEndEffectorTransform));  // flange
+      EXPECT_TRUE(linkCoordinateFrames[4].isApprox(expectedEndEffectorTransform));  // tcp
+    }
+
+    TEST_F(TestRobot, GetConfiguration_WhenConfigurationIsSet_ReturnsProvidedConfiguration) {
+      // arrange
+      const auto robot = std::make_shared<Robot>();
+
+      const std::vector<DenavitHartenbergParameters> dhTable{ DenavitHartenbergParameters{}, DenavitHartenbergParameters{}, DenavitHartenbergParameters{} };
+      robot->setDHTable(dhTable);
+
+      Eigen::VectorXd expectedConfiguration(3);
+      expectedConfiguration << 3482.02174938, 23981.0981237, -187.0912;
+      robot->setConfiguration(expectedConfiguration);
+
+      // act
+      const Eigen::VectorXd configuration = robot->getConfiguration();
+
+      // assert
+      EXPECT_TRUE(configuration.isApprox(expectedConfiguration));
+    }
+
     TEST_F(TestRobot, GetNumberOfJoints_WhenDefaultConstructed_ReturnsZero) {
       // arrange
       const auto robot = std::make_shared<Robot>();
@@ -232,35 +362,6 @@ namespace kinverse {
 
       // assert
       EXPECT_EQ(numberOfJoints, dhTable.size());
-    }
-
-    TEST_F(TestRobot, GetNumberOfLinks_WhenDefaultConstructed_ReturnsOne) {
-      // arrange
-      const auto robot = std::make_shared<Robot>();
-
-      // act
-      const auto numberOfLinks = robot->getNumberOfLinks();
-
-      // assert
-      EXPECT_EQ(numberOfLinks, 1);
-    }
-
-    TEST_F(TestRobot, GetNumberOfLinks_WhenDHTableIsSet_ReturnsNumberOfRowsInDHTablePlusOne) {
-      // arrange
-      const std::vector<DenavitHartenbergParameters> dhTable{
-        { JointType::Prismatic, 123.234, 89.2349, 98734.10900347, 239487.12 },  //
-        { JointType::Revolute, 34.1234, 2343.3457, 787.232, 9789.2343 },        //
-        { JointType::Revolute, 54.0173, 95.03921, 34.340019, 132.048727 }       //
-      };
-
-      const auto robot = std::make_shared<Robot>();
-      robot->setDHTable(dhTable);
-
-      // act
-      const auto numberOfLinks = robot->getNumberOfLinks();
-
-      // assert
-      EXPECT_EQ(numberOfLinks, dhTable.size() + 1);
     }
 
   }  // namespace core

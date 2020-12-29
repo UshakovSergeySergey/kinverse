@@ -61,7 +61,7 @@ void kinverse::simulator::MainWindow::initializeVisualizer() {
 void kinverse::simulator::MainWindow::initializeRobot() {
   m_robot = factory::RobotFactory::create(core::RobotType::KukaKR5Arc);
 
-  const std::vector<double> configuration{ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+  const Eigen::VectorXd configuration = Eigen::VectorXd::Zero(6);
   m_robot->setConfiguration(configuration);
 }
 
@@ -92,19 +92,19 @@ void kinverse::simulator::MainWindow::initializeProgressIcon() {
 }
 
 void kinverse::simulator::MainWindow::onAxisValueChanged() const {
-  const std::vector<double> configuration = getGuiAxisValues();
+  const Eigen::VectorXd configuration = getGuiAxisValues();
 
   m_robot->setConfiguration(configuration);
   m_kinematicDiagramGizmo->updateRobotConfiguration();
   m_robotGizmo->updateRobotConfiguration();
 
   if (configurationViolatesConstraints(configuration)) {
-    const std::vector<double> clampedConfiguration = m_robot->getConfiguration();
+    const Eigen::VectorXd clampedConfiguration = m_robot->getConfiguration();
     setGuiAxisValues(clampedConfiguration);
   }
 
   //  return;
-  const Eigen::Affine3d endEffectorTransform = m_robot->getLinkCoordinateFrames().back();
+  const Eigen::Affine3d endEffectorTransform = m_robot->getEndEffectorTransform();
   setGuiEndEffectorTransform(endEffectorTransform);
 }
 
@@ -128,7 +128,17 @@ void kinverse::simulator::MainWindow::onFindAnalyticalSolution() {
 void kinverse::simulator::MainWindow::onAnalyticalSolutionFound(const std::vector<std::vector<double>>& solutions) {
   if (m_thread.joinable())
     m_thread.join();
-  updateListOfIKSolutionsGui(solutions);
+
+  //@todo this is a dirty hack. we need to use Eigen::VectorXd everywhere
+  std::vector<Eigen::VectorXd> convertedSolutions{};
+  for (const auto& solution : solutions) {
+    Eigen::VectorXd convertedSolution(solution.size());
+    for (int i = 0; i < solution.size(); ++i)
+      convertedSolution(i) = solution[i];
+    convertedSolutions.push_back(convertedSolution);
+  }
+
+  updateListOfIKSolutionsGui(convertedSolutions);
   enableGui(true);
 }
 
@@ -139,12 +149,12 @@ void kinverse::simulator::MainWindow::onSolutionSelected(const QItemSelection& s
   const auto selectedSolutionIndex = selected.indexes().front().row();
   const auto numberOfJoints = m_robot->getNumberOfJoints();
 
-  std::vector<double> configuration(numberOfJoints, 0.0);
+  Eigen::VectorXd configuration(numberOfJoints);
   for (auto jointCounter = 0u; jointCounter < numberOfJoints; ++jointCounter) {
     const auto item = m_ui.tableWidget_ikSolutions->item(selectedSolutionIndex, jointCounter);
     const auto str = item->text().toStdString();
     const double jointValue = math::degreesToRadians(std::stod(str));
-    configuration[jointCounter] = jointValue;
+    configuration(jointCounter) = jointValue;
   }
 
   setGuiAxisValues(configuration);
@@ -163,20 +173,21 @@ void kinverse::simulator::MainWindow::enableGui(bool enabled) const {
   }
 }
 
-std::vector<double> kinverse::simulator::MainWindow::getGuiAxisValues() const {
-  const std::vector<double> configuration{ math::degreesToRadians(m_ui.doubleSpinBox_A1->value()), math::degreesToRadians(m_ui.doubleSpinBox_A2->value()),
-                                           math::degreesToRadians(m_ui.doubleSpinBox_A3->value()), math::degreesToRadians(m_ui.doubleSpinBox_A4->value()),
-                                           math::degreesToRadians(m_ui.doubleSpinBox_A5->value()), math::degreesToRadians(m_ui.doubleSpinBox_A6->value()) };
+Eigen::VectorXd kinverse::simulator::MainWindow::getGuiAxisValues() const {
+  Eigen::VectorXd configuration(6);
+  configuration << math::degreesToRadians(m_ui.doubleSpinBox_A1->value()), math::degreesToRadians(m_ui.doubleSpinBox_A2->value()),
+      math::degreesToRadians(m_ui.doubleSpinBox_A3->value()), math::degreesToRadians(m_ui.doubleSpinBox_A4->value()),
+      math::degreesToRadians(m_ui.doubleSpinBox_A5->value()), math::degreesToRadians(m_ui.doubleSpinBox_A6->value());
   return configuration;
 }
 
-void kinverse::simulator::MainWindow::setGuiAxisValues(const std::vector<double>& configuration) const {
-  m_ui.doubleSpinBox_A1->setValue(math::radiansToDegrees(configuration[0]));
-  m_ui.doubleSpinBox_A2->setValue(math::radiansToDegrees(configuration[1]));
-  m_ui.doubleSpinBox_A3->setValue(math::radiansToDegrees(configuration[2]));
-  m_ui.doubleSpinBox_A4->setValue(math::radiansToDegrees(configuration[3]));
-  m_ui.doubleSpinBox_A5->setValue(math::radiansToDegrees(configuration[4]));
-  m_ui.doubleSpinBox_A6->setValue(math::radiansToDegrees(configuration[5]));
+void kinverse::simulator::MainWindow::setGuiAxisValues(const Eigen::VectorXd& configuration) const {
+  m_ui.doubleSpinBox_A1->setValue(math::radiansToDegrees(configuration(0)));
+  m_ui.doubleSpinBox_A2->setValue(math::radiansToDegrees(configuration(1)));
+  m_ui.doubleSpinBox_A3->setValue(math::radiansToDegrees(configuration(2)));
+  m_ui.doubleSpinBox_A4->setValue(math::radiansToDegrees(configuration(3)));
+  m_ui.doubleSpinBox_A5->setValue(math::radiansToDegrees(configuration(4)));
+  m_ui.doubleSpinBox_A6->setValue(math::radiansToDegrees(configuration(5)));
 }
 
 Eigen::Affine3d kinverse::simulator::MainWindow::getGuiEndEffectorTransform() const {
@@ -201,7 +212,7 @@ void kinverse::simulator::MainWindow::setGuiEndEffectorTransform(const Eigen::Af
   m_ui.doubleSpinBox_C->setValue(abc.z());
 }
 
-void kinverse::simulator::MainWindow::updateListOfIKSolutionsGui(const std::vector<std::vector<double>>& solutions) const {
+void kinverse::simulator::MainWindow::updateListOfIKSolutionsGui(const std::vector<Eigen::VectorXd>& solutions) const {
   const auto numberOfSolutions = solutions.size();
   const auto numberOfJoints = m_robot->getNumberOfJoints();
 
@@ -218,19 +229,7 @@ void kinverse::simulator::MainWindow::updateListOfIKSolutionsGui(const std::vect
   }
 
   // select current solution
-  const auto computeDistance = [](const std::vector<double>& conf1, const std::vector<double>& conf2) -> double {
-    Eigen::VectorXd c1(conf1.size());
-    for (int i = 0; i < conf1.size(); i++) {
-      c1(i) = conf1[i];
-    }
-
-    Eigen::VectorXd c2(conf2.size());
-    for (int i = 0; i < conf2.size(); i++) {
-      c2(i) = conf2[i];
-    }
-
-    return (c1 - c2).norm();
-  };
+  const auto computeDistance = [](const Eigen::VectorXd& conf1, const Eigen::VectorXd& conf2) -> double { return (conf1 - conf2).norm(); };
 
   double minDistance = std::numeric_limits<double>::max();
   int currentConfigurationIndex = -1;
@@ -246,7 +245,7 @@ void kinverse::simulator::MainWindow::updateListOfIKSolutionsGui(const std::vect
   m_ui.tableWidget_ikSolutions->selectRow(currentConfigurationIndex);
 }
 
-bool kinverse::simulator::MainWindow::configurationViolatesConstraints(const std::vector<double>& configuration) const {
+bool kinverse::simulator::MainWindow::configurationViolatesConstraints(const Eigen::VectorXd& configuration) const {
   bool violatesConstraints = false;
 
   const auto constraints = m_robot->getJointConstraints();
@@ -260,7 +259,7 @@ bool kinverse::simulator::MainWindow::configurationViolatesConstraints(const std
 void kinverse::simulator::MainWindow::solveIK() {
   const bool takeTransformFromGui = m_ui.radioButton_endEffectorFromGUI->isChecked();
 
-  Eigen::Affine3d endEffectorTransform = m_robot->getLinkCoordinateFrames().back();
+  Eigen::Affine3d endEffectorTransform = m_robot->getEndEffectorTransform();
   if (takeTransformFromGui)
     endEffectorTransform = getGuiEndEffectorTransform();
 

@@ -42,86 +42,44 @@ namespace kinverse {
     class TestDenavitHartenbergParameters : public testing::Test, public testing::WithParamInterface<DHParamsEquality> {
      protected:
       Eigen::Matrix4d getDHMatrix(double d, double theta, double r, double alpha, double angle, double distance) const {
-        const double cosTheta = cos(theta + angle);
-        const double sinTheta = sin(theta + angle);
-        const double cosAlpha = cos(alpha);
-        const double sinAlpha = sin(alpha);
-
-        Eigen::Matrix4d matrix;
-        matrix(0, 0) = cosTheta;
-        matrix(0, 1) = -sinTheta * cosAlpha;
-        matrix(0, 2) = sinTheta * sinAlpha;
-        matrix(0, 3) = r * cosTheta;
-
-        matrix(1, 0) = sinTheta;
-        matrix(1, 1) = cosTheta * cosAlpha;
-        matrix(1, 2) = -cosTheta * sinAlpha;
-        matrix(1, 3) = r * sinTheta;
-
-        matrix(2, 0) = 0.0;
-        matrix(2, 1) = sinAlpha;
-        matrix(2, 2) = cosAlpha;
-        matrix(2, 3) = d + distance;
-
-        matrix(3, 0) = 0.0;
-        matrix(3, 1) = 0.0;
-        matrix(3, 2) = 0.0;
-        matrix(3, 3) = 1.0;
-
-        return matrix;
+        return getZMatrix(d, theta, angle, distance) * getXMatrix(r, alpha);
       }
       Eigen::Matrix4d getZMatrix(double d, double theta, double angle, double distance) const {
-        const double cosTheta = cos(theta + angle);
-        const double sinTheta = sin(theta + angle);
-
-        Eigen::Matrix4d matrix;
-        matrix(0, 0) = cosTheta;
-        matrix(0, 1) = -sinTheta;
-        matrix(0, 2) = 0.0;
-        matrix(0, 3) = 0.0;
-
-        matrix(1, 0) = sinTheta;
-        matrix(1, 1) = cosTheta;
-        matrix(1, 2) = 0.0;
-        matrix(1, 3) = 0.0;
-
-        matrix(2, 0) = 0.0;
-        matrix(2, 1) = 0.0;
-        matrix(2, 2) = 1.0;
-        matrix(2, 3) = d + distance;
-
-        matrix(3, 0) = 0.0;
-        matrix(3, 1) = 0.0;
-        matrix(3, 2) = 0.0;
-        matrix(3, 3) = 1.0;
-
-        return matrix;
+        return getRotationMatrixAboutZAxis(theta + angle) * getZTranslationMatrix(d + distance);
       }
       Eigen::Matrix4d getXMatrix(double r, double alpha) const {
-        const double cosAlpha = cos(alpha);
-        const double sinAlpha = sin(alpha);
+        return getRotationMatrixAboutXAxis(alpha) * getXTranslationMatrix(r);
+      }
+      Eigen::Matrix4d getRotationMatrixAboutZAxis(double angle) const {
+        const double cosine = cos(angle);
+        const double sine = sin(angle);
 
-        Eigen::Matrix4d matrix;
-        matrix(0, 0) = 1.0;
-        matrix(0, 1) = 0.0;
-        matrix(0, 2) = 0.0;
-        matrix(0, 3) = r;
+        Eigen::Matrix4d matrix = Eigen::Matrix4d::Identity();
+        matrix(0, 0) = cosine;
+        matrix(0, 1) = -sine;
+        matrix(1, 0) = sine;
+        matrix(1, 1) = cosine;
+        return matrix;
+      }
+      Eigen::Matrix4d getRotationMatrixAboutXAxis(double angle) const {
+        const double cosine = cos(angle);
+        const double sine = sin(angle);
 
-        matrix(1, 0) = 0.0;
-        matrix(1, 1) = cosAlpha;
-        matrix(1, 2) = -sinAlpha;
-        matrix(1, 3) = 0.0;
-
-        matrix(2, 0) = 0.0;
-        matrix(2, 1) = sinAlpha;
-        matrix(2, 2) = cosAlpha;
-        matrix(2, 3) = 0.0;
-
-        matrix(3, 0) = 0.0;
-        matrix(3, 1) = 0.0;
-        matrix(3, 2) = 0.0;
-        matrix(3, 3) = 1.0;
-
+        Eigen::Matrix4d matrix = Eigen::Matrix4d::Identity();
+        matrix(1, 1) = cosine;
+        matrix(1, 2) = -sine;
+        matrix(2, 1) = sine;
+        matrix(2, 2) = cosine;
+        return matrix;
+      }
+      Eigen::Matrix4d getZTranslationMatrix(double displacement) const {
+        Eigen::Matrix4d matrix = Eigen::Matrix4d::Identity();
+        matrix(2, 3) = displacement;
+        return matrix;
+      }
+      Eigen::Matrix4d getXTranslationMatrix(double displacement) const {
+        Eigen::Matrix4d matrix = Eigen::Matrix4d::Identity();
+        matrix(0, 3) = displacement;
         return matrix;
       }
     };

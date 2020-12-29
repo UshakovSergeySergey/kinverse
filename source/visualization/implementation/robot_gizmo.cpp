@@ -83,15 +83,15 @@ void kinverse::visualization::RobotGizmo::updateRobotConfiguration() {
   // update base link mesh
   m_meshGizmos.front()->setTransform(linkTransforms.front());
 
-  // update link meshes
-  for (auto linkCounter = 0u; linkCounter < linkTransforms.size() - 1; ++linkCounter) {
-    const Eigen::Affine3d jointTransform = dhTable[linkCounter].getTransformZ(robotConfiguration[linkCounter]);
-    const Eigen::Affine3d transform = linkTransforms[linkCounter] * jointTransform;
-    m_meshGizmos[linkCounter + 1]->setTransform(transform);
+  // update joint meshes
+  for (auto jointCounter = 0u; jointCounter < m_robot->getNumberOfJoints(); ++jointCounter) {
+    const Eigen::Affine3d jointTransform = dhTable[jointCounter].getJointTransform(robotConfiguration[jointCounter]);
+    const Eigen::Affine3d transform = linkTransforms[jointCounter + 1] * jointTransform;
+    m_meshGizmos[jointCounter + 1]->setTransform(transform);
   }
 
   // update end effector
-  const Eigen::Affine3d endEffectorTransform = linkTransforms.back();
+  const Eigen::Affine3d endEffectorTransform = m_robot->getEndEffectorTransform();
   m_endEffectorGizmo->setTransform(endEffectorTransform);
 
   render();

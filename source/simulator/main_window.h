@@ -33,15 +33,15 @@ namespace kinverse {
       void onAnalyticalSolutionFound(const std::vector<std::vector<double>>& solutions);
       void onSolutionSelected(const QItemSelection& selected, const QItemSelection& deselected);
 
-      std::vector<double> getGuiAxisValues() const;
-      void setGuiAxisValues(const std::vector<double>& configuration) const;
+      Eigen::VectorXd getGuiAxisValues() const;
+      void setGuiAxisValues(const Eigen::VectorXd& configuration) const;
 
       Eigen::Affine3d getGuiEndEffectorTransform() const;
       void setGuiEndEffectorTransform(const Eigen::Affine3d& endEffectorTransform) const;
 
       void enableGui(bool enabled) const;
-      bool configurationViolatesConstraints(const std::vector<double>& configuration) const;
-      void updateListOfIKSolutionsGui(const std::vector<std::vector<double>>& solutions) const;
+      bool configurationViolatesConstraints(const Eigen::VectorXd& configuration) const;
+      void updateListOfIKSolutionsGui(const std::vector<Eigen::VectorXd>& solutions) const;
 
       void solveIK();
 

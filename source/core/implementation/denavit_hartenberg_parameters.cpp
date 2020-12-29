@@ -118,6 +118,18 @@ Eigen::Affine3d kinverse::core::DenavitHartenbergParameters::getTransformX() con
   return transform;
 }
 
+Eigen::Affine3d kinverse::core::DenavitHartenbergParameters::getJointTransform(double value) const {
+  if (std::isfinite(value) == false)
+    throw std::domain_error("Failed to get joint transform! Value must be finite number but provided " + std::to_string(value) + "!");
+
+  Eigen::Affine3d jointTransform;
+  if (m_jointType == JointType::Revolute)
+    jointTransform = Eigen::AngleAxisd(value, Eigen::Vector3d::UnitZ());
+  else
+    jointTransform = Eigen::Translation3d(0.0, 0.0, value);
+  return jointTransform;
+}
+
 bool kinverse::core::operator==(const DenavitHartenbergParameters& lhs, const DenavitHartenbergParameters& rhs) {
   if (lhs.getJointType() != rhs.getJointType())
     return false;

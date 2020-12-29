@@ -10,6 +10,7 @@
 #include <kinverse/core/analytical_solver.h>
 #include <kinverse/math/math.h>
 #include <kinverse/io/mesh_reader.h>
+#include <kinverse/visualization/kinematic_diagram_gizmo.h>
 
 #include <iostream>
 #include <vtkPLYReader.h>
@@ -42,19 +43,43 @@ void printEndEffector(const Eigen::Vector3d& xyz, const Eigen::Vector3d& abc) {
 int debugVisualizer();
 
 int main(int argc, char** argv) {
-  return debugVisualizer();
+  /*{
+    const std::vector<kinverse::core::DenavitHartenbergParameters> dhTable{
+      kinverse::core::DenavitHartenbergParameters{ kinverse::core::JointType::Revolute, 0.0, 0.0, 1000.0, -M_PI_2 },         //
+      kinverse::core::DenavitHartenbergParameters{ kinverse::core::JointType::Prismatic, 1000.0, -M_PI_2, 1000.0, -M_PI_2 }  //
+    };
+
+    const auto robot = std::make_shared<kinverse::core::Robot>();
+    robot->setDHTable(dhTable);
+
+    // create visualizer
+    auto kinverseVisualizer = std::make_shared<kinverse::visualization::KinverseVisualizer>();
+
+    auto robotGizmo = std::make_shared<kinverse::visualization::KinematicDiagramGizmo>(nullptr, robot);
+    kinverseVisualizer->addGizmo(robotGizmo);
+
+    for (int i = 0; i < 10000; i++)
+      std::cout << i << std::endl;
+    // std::cin.get();
+
+    return 0;
+  }*/
+
+  //  return debugVisualizer();
+
   // create robot
   auto robot = kinverse::factory::RobotFactory::create(kinverse::core::RobotType::KukaKR5Arc);
 
   // set robot initial configuration
-  const std::vector<double> robotConfiguration{ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+  Eigen::VectorXd robotConfiguration(6);
+  robotConfiguration.setZero();
   //{ kinverse::math::degreesToRadians(22.854), kinverse::math::degreesToRadians(-80.0),
   //                                              kinverse::math::degreesToRadians(80.0),   kinverse::math::degreesToRadians(0.073),
   //                                              kinverse::math::degreesToRadians(22.879), kinverse::math::degreesToRadians(119.070) };
   robot->setConfiguration(robotConfiguration);
 
   // set target for IK
-  const Eigen::Affine3d targetTransform = robot->getLinkCoordinateFrames().back();
+  const Eigen::Affine3d targetTransform = robot->getEndEffectorTransform();
   Eigen::Vector3d targetXYZ;
   Eigen::Vector3d targetABC;
   kinverse::math::toXYZABC(targetTransform, targetXYZ, targetABC);
@@ -87,11 +112,14 @@ int main(int argc, char** argv) {
   const auto solutions = ikSolver->solve(targetTransform);
 
   // set robot configuration
-  robot->setConfiguration(solutions.front());
+  Eigen::VectorXd solution(6);
+  for (int i = 0; i < 6; ++i)
+    solution(i) = solutions.front()[i];
+  robot->setConfiguration(solution);
   robotGizmo->updateRobotConfiguration();
 
   // print info
-  const Eigen::Affine3d solvedTransform = robot->getLinkCoordinateFrames().back();
+  const Eigen::Affine3d solvedTransform = robot->getEndEffectorTransform();
   Eigen::Vector3d solvedXYZ;
   Eigen::Vector3d solvedABC;
   kinverse::math::toXYZABC(solvedTransform, solvedXYZ, solvedABC);

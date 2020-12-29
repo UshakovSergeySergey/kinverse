@@ -317,6 +317,65 @@ namespace kinverse {
       EXPECT_TRUE(transform.isApprox(zTransform * xTransform));
     }
 
+    TEST_F(TestDenavitHartenbergParameters, GetJointTransform_WhenAxisValueIsNotFinite_ThrowsException) {
+      // arrange
+      DenavitHartenbergParameters dhParameters;
+
+      // act assert
+      EXPECT_THROW(dhParameters.getJointTransform(std::numeric_limits<double>::quiet_NaN()), std::domain_error);
+      EXPECT_THROW(dhParameters.getJointTransform(std::numeric_limits<double>::infinity()), std::domain_error);
+    }
+
+    TEST_F(TestDenavitHartenbergParameters, GetJointTransforms_WhenJointIsRevoluteAndAxisValueIsZero_ReturnsIdentityTransform) {
+      // arrange
+      DenavitHartenbergParameters dhParameters(JointType::Revolute);
+
+      // act
+      const auto transform = dhParameters.getJointTransform(0.0);
+
+      // assert
+      EXPECT_TRUE(transform.isApprox(Eigen::Affine3d::Identity()));
+    }
+
+    TEST_F(TestDenavitHartenbergParameters, GetJointTransforms_WhenJointIsPrismaticAndAxisValueIsZero_ReturnsIdentityTransform) {
+      // arrange
+      DenavitHartenbergParameters dhParameters(JointType::Prismatic);
+
+      // act
+      const auto transform = dhParameters.getJointTransform(0.0);
+
+      // assert
+      EXPECT_TRUE(transform.isApprox(Eigen::Affine3d::Identity()));
+    }
+
+    TEST_F(TestDenavitHartenbergParameters, GetJointTransforms_WhenJointIsRevolute_ReturnsValidTransform) {
+      // arrange
+      const auto angle = M_PI_2 / 3.0;
+      const Eigen::Matrix4d expectedMatrix = getRotationMatrixAboutZAxis(angle);
+
+      DenavitHartenbergParameters dhParameters(JointType::Revolute);
+
+      // act
+      const auto transform = dhParameters.getJointTransform(angle);
+
+      // assert
+      EXPECT_TRUE(transform.matrix().isApprox(expectedMatrix));
+    }
+
+    TEST_F(TestDenavitHartenbergParameters, GetJointTransforms_WhenJointIsPrismatic_ReturnsValidTransform) {
+      // arrange
+      const auto displacement = 123.0456789;
+      const Eigen::Matrix4d expectedMatrix = getZTranslationMatrix(displacement);
+
+      DenavitHartenbergParameters dhParameters(JointType::Prismatic);
+
+      // act
+      const auto transform = dhParameters.getJointTransform(displacement);
+
+      // assert
+      EXPECT_TRUE(transform.matrix().isApprox(expectedMatrix));
+    }
+
     TEST_P(TestDenavitHartenbergParameters, EqualityOperator_WorksCorrectly) {
       // arrange
       const auto lhs = std::get<0>(GetParam());

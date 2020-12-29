@@ -32,34 +32,58 @@
 
 #pragma once
 
-#include <kinverse/factory/robot_factory.h>
+#include <kinverse/core/robot.h>
+#include <kinverse/math/math.h>
 
 namespace kinverse {
   namespace core {
 
-    using RobotConfiguration = Eigen::VectorXd;
+    using RobotConfiguration = std::vector<double>;
     using EndEffectorPosition = Eigen::Vector3d;
     using EndEffectorOrientation = Eigen::Vector3d;
     using FKTask = std::tuple<RobotConfiguration, EndEffectorPosition, EndEffectorOrientation>;
 
     class TestForwardKinematicsSolver : public testing::Test, public testing::WithParamInterface<FKTask> {
      protected:
-      Robot::Ptr getKukaKR5ArcRobot() const {
-        return factory::RobotFactory::create(RobotType::KukaKR5Arc);
+      void getConfigurationAndSolution(Eigen::VectorXd& configuration, Eigen::Affine3d& solution) const {
+        const Eigen::Vector3d expectedXYZ = std::get<1>(GetParam());
+        const Eigen::Vector3d expectedABC = std::get<2>(GetParam());
+
+        configuration = convertRobotConfiguration(std::get<0>(GetParam()));
+        solution = math::fromXYZABC(expectedXYZ, expectedABC);
+      }
+      Robot::Ptr createSimpleRobotWithTwoJoints() const {
+        const std::vector<DenavitHartenbergParameters> dhTable{
+          DenavitHartenbergParameters{ JointType::Revolute, 0.0, 0.0, 100.0, -M_PI_2 },        //
+          DenavitHartenbergParameters{ JointType::Prismatic, 200.0, -M_PI_2, 300.0, -M_PI_2 }  //
+        };
+
+        const auto robot = std::make_shared<Robot>();
+        robot->setDHTable(dhTable);
+        return robot;
+      }
+      Eigen::VectorXd convertRobotConfiguration(const std::vector<double>& axisValues) const {
+        Eigen::VectorXd configuration(axisValues.size());
+        for (auto jointCounter = 0u; jointCounter < axisValues.size(); ++jointCounter) {
+          configuration(jointCounter) = axisValues[jointCounter];
+        }
+        return configuration;
       }
     };
 
-    // INSTANTIATE_TEST_SUITE_P(SolvesKukaKR5Arc,
-    //                         TestForwardKinematicsSolver,
-    //                         testing::Values(                                                                                    //
-    //                             FKTask{ { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 1515.0, 0.0, 520.0 }, { 180.0, 90.0, 180.0 } },     //
-    //                             FKTask{ { 0.0, -90.0, 90.0, 0.0, 90.0, 0.0 }, { 800.0, 0.0, 1005.0 }, { 180.0, 0.0, 180.0 } },  //
-    //                             FKTask{},                                                                                       //
-    //                             FKTask{},                                                                                       //
-    //                             FKTask{},                                                                                       //
-    //                             FKTask{},                                                                                       //
-    //                             FKTask{}                                                                                        //
-    //                             ));
+    INSTANTIATE_TEST_SUITE_P(Solve_SolvesForwardKinematicsCorrectly,
+                             TestForwardKinematicsSolver,
+                             testing::Values(                                                                                                  //
+                                 FKTask{ { 0.0, 0.0 }, { 100.0, 200.0, 300.0 }, { M_PI, -M_PI_2, 0.0 } },                                      //
+                                 FKTask{ { 0.0, 500.0 }, { 100.0, 700.0, 300.0 }, { M_PI, -M_PI_2, 0.0 } },                                    //
+                                 FKTask{ { 0.0, -500.0 }, { 100.0, -300.0, 300.0 }, { M_PI, -M_PI_2, 0.0 } },                                  //
+                                 FKTask{ { M_PI_2, 0.0 }, { -200.0, 100.0, 300.0 }, { M_PI_2, -M_PI_2, M_PI } },                               //
+                                 FKTask{ { -M_PI_2, 0.0 }, { 200.0, -100.0, 300.0 }, { M_PI_2, -M_PI_2, 0.0 } },                               //
+                                 FKTask{ { M_PI_2 + M_PI_4, -300.0 }, { 0.0, 100.0 * std::sqrt(2.0), 300.0 }, { M_PI_4, -M_PI_2, -M_PI_2 } },  //
+                                 FKTask{ { -M_PI / 3.0, 100.0 },
+                                         { 50.0 + 300.0 * cos(M_PI_2 / 3.0), 150.0 - 100.0 * cos(M_PI_2 / 3.0), 300.0 },
+                                         { M_PI_2 / 3.0, -M_PI_2, M_PI_2 } }  //
+                                 ));
 
   }  // namespace core
 }  // namespace kinverse
