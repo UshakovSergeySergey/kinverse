@@ -38,8 +38,11 @@
     <ClInclude Include="..\..\source\core\implementation\stdafx.h">
       <Filter>implementation</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\core\include\kinverse\core\forward_kinematics_solver.h">
-      <Filter>include</Filter>
+    <ClInclude Include="..\..\source\core\implementation\forward_kinematics_solver.h">
+      <Filter>implementation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\implementation\analytical_solver_implementation.h">
+      <Filter>implementation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -62,6 +65,9 @@
       <Filter>implementation</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\core\implementation\forward_kinematics_solver.cpp">
+      <Filter>implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\implementation\analytical_solver_implementation.cpp">
       <Filter>implementation</Filter>
     </ClCompile>
   </ItemGroup>

@@ -32,8 +32,8 @@
 
 #pragma once
 
-#include "exports.h"
-#include "robot.h"
+#include "../include/kinverse/core/exports.h"
+#include "../include/kinverse/core/robot.h"
 
 namespace kinverse {
   namespace core {

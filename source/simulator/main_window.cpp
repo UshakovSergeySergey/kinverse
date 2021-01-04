@@ -26,12 +26,12 @@ kinverse::simulator::MainWindow::MainWindow(QWidget* parent) : QMainWindow{ pare
   QObject::connect(m_ui.doubleSpinBox_A6, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::onAxisValueChanged);
 
   // change end effector transform
-  /*QObject::connect(m_ui.doubleSpinBox_X, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::onFindAnalyticalSolution);
+  QObject::connect(m_ui.doubleSpinBox_X, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::onFindAnalyticalSolution);
   QObject::connect(m_ui.doubleSpinBox_Y, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::onFindAnalyticalSolution);
   QObject::connect(m_ui.doubleSpinBox_Z, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::onFindAnalyticalSolution);
   QObject::connect(m_ui.doubleSpinBox_A, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::onFindAnalyticalSolution);
   QObject::connect(m_ui.doubleSpinBox_B, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::onFindAnalyticalSolution);
-  QObject::connect(m_ui.doubleSpinBox_C, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::onFindAnalyticalSolution);*/
+  QObject::connect(m_ui.doubleSpinBox_C, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::onFindAnalyticalSolution);
 
   // solve IK analytically
   QObject::connect(m_ui.pushButton_solveInverseKinematics, &QPushButton::pressed, this, &MainWindow::onFindAnalyticalSolution);
@@ -103,7 +103,7 @@ void kinverse::simulator::MainWindow::onAxisValueChanged() const {
     setGuiAxisValues(clampedConfiguration);
   }
 
-  //  return;
+  return;
   const Eigen::Affine3d endEffectorTransform = m_robot->getEndEffectorTransform();
   setGuiEndEffectorTransform(endEffectorTransform);
 }

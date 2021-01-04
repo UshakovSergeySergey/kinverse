@@ -31,7 +31,7 @@
  */
 
 #include "stdafx.h"
-#include "../include/kinverse/core/forward_kinematics_solver.h"
+#include "forward_kinematics_solver.h"
 #include "../include/kinverse/core/robot.h"
 
 kinverse::core::ForwardKinematicsSolver::ForwardKinematicsSolver(Robot::ConstPtr robot) {

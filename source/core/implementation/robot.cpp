@@ -32,7 +32,7 @@
 
 #include "stdafx.h"
 #include "../include/kinverse/core/robot.h"
-#include "../include/kinverse/core/forward_kinematics_solver.h"
+#include "forward_kinematics_solver.h"
 
 void kinverse::core::Robot::setDHTable(const std::vector<DenavitHartenbergParameters>& dhTable) {
   m_dhTable = dhTable;
@@ -62,30 +62,45 @@ void kinverse::core::Robot::setTransform(const Eigen::Affine3d& transform) {
   if (!transform.matrix().allFinite())
     throw std::domain_error("Failed to set transform! All values of the transform matrix must be finite numbers!");
   m_transform = transform;
+  m_inverseTransform = transform.inverse();
 }
 
 Eigen::Affine3d kinverse::core::Robot::getTransform() const {
   return m_transform;
 }
 
+Eigen::Affine3d kinverse::core::Robot::getInverseTransform() const {
+  return m_inverseTransform;
+}
+
 void kinverse::core::Robot::setBaseTransform(const Eigen::Affine3d& transform) {
   if (!transform.matrix().allFinite())
     throw std::domain_error("Failed to set base transform! All values of the transform matrix must be finite numbers!");
   m_baseTransform = transform;
+  m_inverseBaseTransform = transform.inverse();
 }
 
 Eigen::Affine3d kinverse::core::Robot::getBaseTransform() const {
   return m_baseTransform;
 }
 
+Eigen::Affine3d kinverse::core::Robot::getInverseBaseTransform() const {
+  return m_inverseBaseTransform;
+}
+
 void kinverse::core::Robot::setTCPTransform(const Eigen::Affine3d& transform) {
   if (!transform.matrix().allFinite())
     throw std::domain_error("Failed to set tcp transform! All values of the transform matrix must be finite numbers!");
   m_tcpTransform = transform;
+  m_inverseTcpTransform = transform.inverse();
 }
 
 Eigen::Affine3d kinverse::core::Robot::getTCPTransform() const {
   return m_tcpTransform;
+}
+
+Eigen::Affine3d kinverse::core::Robot::getInverseTCPTransform() const {
+  return m_inverseTcpTransform;
 }
 
 void kinverse::core::Robot::setConfiguration(const Eigen::VectorXd& configuration) {

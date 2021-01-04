@@ -170,6 +170,22 @@ namespace kinverse {
       EXPECT_THROW(robot->setTransform(transform), std::domain_error);
     }
 
+    TEST_F(TestRobot, SetTransform_WhenTransformIsSet_UpdatesInverseTransform) {
+      // arrange
+      const Eigen::Affine3d transform =
+          Eigen::Affine3d().fromPositionOrientationScale(Eigen::Vector3d::Random(), Eigen::Quaterniond::UnitRandom(), Eigen::Vector3d::Ones());
+      const Eigen::Affine3d expectedInverseTransform = transform.inverse();
+
+      const auto robot = std::make_shared<Robot>();
+      robot->setTransform(transform);
+
+      // act
+      const Eigen::Affine3d inverseTransform = robot->getInverseTransform();
+
+      // assert
+      EXPECT_TRUE(inverseTransform.isApprox(expectedInverseTransform));
+    }
+
     TEST_F(TestRobot, GetBaseTransform_WhenDefaultConstructed_ReturnsIdentityTransform) {
       // arrange
       const auto robot = std::make_shared<Robot>();
@@ -205,6 +221,22 @@ namespace kinverse {
       EXPECT_THROW(robot->setBaseTransform(transform), std::domain_error);
     }
 
+    TEST_F(TestRobot, SetBaseTransform_WhenBaseTransformIsSet_UpdatesInverseBaseTransform) {
+      // arrange
+      const Eigen::Affine3d transform =
+          Eigen::Affine3d().fromPositionOrientationScale(Eigen::Vector3d::Random(), Eigen::Quaterniond::UnitRandom(), Eigen::Vector3d::Ones());
+      const Eigen::Affine3d expectedInverseTransform = transform.inverse();
+
+      const auto robot = std::make_shared<Robot>();
+      robot->setBaseTransform(transform);
+
+      // act
+      const Eigen::Affine3d inverseTransform = robot->getInverseBaseTransform();
+
+      // assert
+      EXPECT_TRUE(inverseTransform.isApprox(expectedInverseTransform));
+    }
+
     TEST_F(TestRobot, GetTCPTransform_WhenDefaultConstructed_ReturnsIdentityTransform) {
       // arrange
       const auto robot = std::make_shared<Robot>();
@@ -238,6 +270,22 @@ namespace kinverse {
 
       // act assert
       EXPECT_THROW(robot->setTCPTransform(transform), std::domain_error);
+    }
+
+    TEST_F(TestRobot, SetTCPTransform_WhenTCPTransformIsSet_UpdatesInverseTCPTransform) {
+      // arrange
+      const Eigen::Affine3d transform =
+          Eigen::Affine3d().fromPositionOrientationScale(Eigen::Vector3d::Random(), Eigen::Quaterniond::UnitRandom(), Eigen::Vector3d::Ones());
+      const Eigen::Affine3d expectedInverseTransform = transform.inverse();
+
+      const auto robot = std::make_shared<Robot>();
+      robot->setTCPTransform(transform);
+
+      // act
+      const Eigen::Affine3d inverseTransform = robot->getInverseTCPTransform();
+
+      // assert
+      EXPECT_TRUE(inverseTransform.isApprox(expectedInverseTransform));
     }
 
     TEST_F(TestRobot, SetConfiguration_WhenConfigurationDoesntMatchNumberOfJoints_ThrowsException) {

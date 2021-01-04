@@ -37,6 +37,8 @@
 #include "joint_constraints.h"
 #include "mesh.h"
 
+//@todo remove enable_shared_from_this from robot
+
 namespace kinverse {
   namespace core {
 
@@ -124,6 +126,12 @@ namespace kinverse {
       Eigen::Affine3d getTransform() const;
 
       /**
+       * @brief Because computing inverse transform can be costly, this method returns
+       * inverse transform of the robot. This inverse transform is precomputed once transform is set.
+       */
+      Eigen::Affine3d getInverseTransform() const;
+
+      /**
        * @brief This method sets robot base transform (transform from robot
        * local coordinate frame to first joint coordinate frame).
        * For example KUKA KR5 Arc has its first axis pointing down,
@@ -146,6 +154,12 @@ namespace kinverse {
       Eigen::Affine3d getBaseTransform() const;
 
       /**
+       * @brief Because computing inverse transform can be costly, this method returns
+       * inverse base transform of the robot. This inverse transform is precomputed once base transform is set.
+       */
+      Eigen::Affine3d getInverseBaseTransform() const;
+
+      /**
        * @brief Sets robot TCP (Tool Center Point) transform. Usually, robots have
        * some tool mounted on their flange (e.g. grippers, welding tools, etc.).
        * This transform tells how the tool coordinate frame is positioned and rotated relative to robot's flange.
@@ -157,6 +171,12 @@ namespace kinverse {
        * @brief Returns robot's TCP transform
        */
       Eigen::Affine3d getTCPTransform() const;
+
+      /**
+       * @brief Because computing inverse transform can be costly, this method returns
+       * inverse tcp transform of the robot. This inverse transform is precomputed once tcp transform is set.
+       */
+      Eigen::Affine3d getInverseTCPTransform() const;
 
       /**
        * @brief This method sets robot's configuration.
@@ -198,14 +218,29 @@ namespace kinverse {
       Eigen::Affine3d m_transform{ Eigen::Affine3d::Identity() };
 
       /**
+       * @brief Stores robot's inverse transform, because computing inverse transform can be costly.
+       */
+      Eigen::Affine3d m_inverseTransform{ Eigen::Affine3d::Identity() };
+
+      /**
        * @brief Stores transform from the robot's local coordinate space to robot's first joint coordinate space.
        */
       Eigen::Affine3d m_baseTransform{ Eigen::Affine3d::Identity() };
 
       /**
+       * @brief Stores robot's inverse base transform, because computing inverse transform can be costly.
+       */
+      Eigen::Affine3d m_inverseBaseTransform{ Eigen::Affine3d::Identity() };
+
+      /**
        * @brief Stores transform from the robot flange coordinate space to TCP coordinate space.
        */
       Eigen::Affine3d m_tcpTransform{ Eigen::Affine3d::Identity() };
+
+      /**
+       * @brief Stores robot's inverse tcp transform, because computing inverse transform can be costly.
+       */
+      Eigen::Affine3d m_inverseTcpTransform{ Eigen::Affine3d::Identity() };
 
       /**
        * @brief Stores Denavit-Hartenberg table that describes robot joints.

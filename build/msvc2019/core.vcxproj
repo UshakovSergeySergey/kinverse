@@ -95,11 +95,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\source\core\implementation\analytical_solver_implementation.h" />
+    <ClInclude Include="..\..\source\core\implementation\forward_kinematics_solver.h" />
     <ClInclude Include="..\..\source\core\implementation\stdafx.h" />
     <ClInclude Include="..\..\source\core\include\kinverse\core\analytical_solver.h" />
     <ClInclude Include="..\..\source\core\include\kinverse\core\denavit_hartenberg_parameters.h" />
     <ClInclude Include="..\..\source\core\include\kinverse\core\exports.h" />
-    <ClInclude Include="..\..\source\core\include\kinverse\core\forward_kinematics_solver.h" />
     <ClInclude Include="..\..\source\core\include\kinverse\core\joint_constraints.h" />
     <ClInclude Include="..\..\source\core\include\kinverse\core\joint_type.h" />
     <ClInclude Include="..\..\source\core\include\kinverse\core\mesh.h" />
@@ -108,6 +109,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\core\implementation\analytical_solver.cpp" />
+    <ClCompile Include="..\..\source\core\implementation\analytical_solver_implementation.cpp" />
     <ClCompile Include="..\..\source\core\implementation\denavit_hartenberg_parameters.cpp" />
     <ClCompile Include="..\..\source\core\implementation\forward_kinematics_solver.cpp" />
     <ClCompile Include="..\..\source\core\implementation\joint_constraints.cpp" />

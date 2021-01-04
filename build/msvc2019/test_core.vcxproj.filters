@@ -32,6 +32,9 @@
     <ClCompile Include="..\..\source\test_core\test_forward_kinematics_solver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\test_core\test_analytical_solver_implementation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\test_core\stdafx.h">
@@ -53,6 +56,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\test_core\test_forward_kinematics_solver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\test_core\test_analytical_solver_implementation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -61,7 +61,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_SILENCE_CXX17_NEGATORS_DEPRECATION_WARNING;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/eigen-3.3.4/;$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/google-test-1.10.0/include/;$(SolutionDir)/../../source/factory/include/;$(SolutionDir)/../../source/math/include/;$(SolutionDir)/../../source/core/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/eigen-3.3.4/;$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/google-test-1.10.0/include/;$(SolutionDir)/../../source/factory/include/;$(SolutionDir)/../../source/math/include/;$(SolutionDir)/../../source/core/include/;$(SolutionDir)/../../source/core/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -80,7 +80,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_SILENCE_CXX17_NEGATORS_DEPRECATION_WARNING;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/eigen-3.3.4/;$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/google-test-1.10.0/include/;$(SolutionDir)/../../source/factory/include/;$(SolutionDir)/../../source/math/include/;$(SolutionDir)/../../source/core/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/eigen-3.3.4/;$(SolutionDir)/../../../kinverse-dependencies/$(Platform)/google-test-1.10.0/include/;$(SolutionDir)/../../source/factory/include/;$(SolutionDir)/../../source/math/include/;$(SolutionDir)/../../source/core/include/;$(SolutionDir)/../../source/core/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -99,6 +99,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\source\test_core\test_analytical_solver.cpp" />
+    <ClCompile Include="..\..\source\test_core\test_analytical_solver_implementation.cpp" />
     <ClCompile Include="..\..\source\test_core\test_denavit_hartenberg_parameters.cpp" />
     <ClCompile Include="..\..\source\test_core\test_forward_kinematics_solver.cpp" />
     <ClCompile Include="..\..\source\test_core\test_joint_constraints.cpp" />
@@ -108,6 +109,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\source\test_core\stdafx.h" />
     <ClInclude Include="..\..\source\test_core\test_analytical_solver.h" />
+    <ClInclude Include="..\..\source\test_core\test_analytical_solver_implementation.h" />
     <ClInclude Include="..\..\source\test_core\test_denavit_hartenberg_parameters.h" />
     <ClInclude Include="..\..\source\test_core\test_forward_kinematics_solver.h" />
     <ClInclude Include="..\..\source\test_core\test_joint_constraints.h" />

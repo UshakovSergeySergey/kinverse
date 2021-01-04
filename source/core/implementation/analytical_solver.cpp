@@ -1,7 +1,9 @@
 ﻿#include "stdafx.h"
 #include "../include/kinverse/core/analytical_solver.h"
 #include <kinverse/math/math.h>
+#include "analytical_solver_implementation.h"
 
+// SphericalWristRobotArm
 // ArticulatedArm6DofRobot
 // Robot6Dof
 //
@@ -19,14 +21,17 @@
 //};
 
 kinverse::core::AnalyticalSolver::AnalyticalSolver(Robot::ConstPtr robot) : m_robot{ robot } {
-  m_gamma = computeGamma();
-  m_distanceFromSecondToThirdJoint = getDistanceBetweenSecondAndThirdJoints();
-  m_distanceFromThirdJointToWrist = getDistanceBetweenThirdJointAndWristPosition();
+  m_pImpl = std::make_shared<AnalyticalSolverImplementation>(robot);
 }
 
-std::vector<std::vector<double>> kinverse::core::AnalyticalSolver::solve(const Eigen::Affine3d& endEffectorTransform) {
-  m_targetTransform = convertWorldToLocal(endEffectorTransform);
-  m_wristPosition = computeWristPosition(m_targetTransform);
+std::vector<std::vector<double>> kinverse::core::AnalyticalSolver::solve(const Eigen::Affine3d& tcpTransform) {
+  if (tcpTransform.matrix().allFinite() == false)
+    throw std::domain_error("Failed to solve IK problem! TCP transform must have only finite values!");
+
+  m_flangeTransform = m_pImpl->convertWorldToA1Local(tcpTransform);
+  m_flangeTransform = m_pImpl->convertTCPToFlange(m_flangeTransform);
+
+  m_wristPosition = computeWristPosition(m_flangeTransform);
 
   std::vector<std::vector<double>> positionalSolutions = solveForPosition();
 
@@ -39,43 +44,16 @@ std::vector<std::vector<double>> kinverse::core::AnalyticalSolver::solve(const E
   return solutions;
 }
 
-double kinverse::core::AnalyticalSolver::computeGamma() const {
-  const Eigen::Vector3d fourthJointPosition = m_robot->getDHTable()[2].getTransform().translation();
-  const Eigen::Vector3d wristPosition = (m_robot->getDHTable()[2].getTransform() * m_robot->getDHTable()[3].getTransform()).translation();
-
-  const double a = (wristPosition - fourthJointPosition).norm();
-  const double c = wristPosition.norm();
-
-  const double cosine = a / c;
-  double angle = std::abs(acos(cosine));
-  if (angle > M_PI_2)
-    angle = M_PI - angle;
-
-  return angle;
-};
-
-double kinverse::core::AnalyticalSolver::getDistanceBetweenSecondAndThirdJoints() const {
-  return m_robot->getDHTable()[1].getTransform().translation().norm();
-}
-
-double kinverse::core::AnalyticalSolver::getDistanceBetweenThirdJointAndWristPosition() const {
-  return (m_robot->getDHTable()[2].getTransform() * m_robot->getDHTable()[3].getTransform()).translation().norm();
-}
-
-Eigen::Affine3d kinverse::core::AnalyticalSolver::convertWorldToLocal(const Eigen::Affine3d& transform) const {
-  return m_robot->getBaseTransform().inverse() * transform;
-}
-
 Eigen::Vector3d kinverse::core::AnalyticalSolver::computeWristPosition(const Eigen::Affine3d& targetTransform) const {
   const Eigen::Vector3d endEffectorPosition = targetTransform.translation();
   const Eigen::Vector3d endEffectorZAxis = targetTransform.rotation().col(2);
-  const double wristToEndEffectorDisplacement = m_robot->getDHTable().back().getTransform().translation().norm();
+  const double wristToEndEffectorDisplacement = std::abs(m_robot->getDHTable().back().getZAxisDisplacement());
   const Eigen::Vector3d wristPosition = endEffectorPosition - endEffectorZAxis * wristToEndEffectorDisplacement;
   return wristPosition;
 }
 
 std::vector<std::vector<double>> kinverse::core::AnalyticalSolver::solveForPosition() const {
-  const Eigen::Vector3d firstJointZAxis = getFirstJointZAxis();
+  const Eigen::Vector3d firstJointZAxis = m_pImpl->getA1ZAxis();
   if (math::pointLiesOnLine(Eigen::Vector3d::Zero(), firstJointZAxis, m_wristPosition)) {
     // shoulder singularity (KUKA calls it overhead singularity)
     throw std::domain_error("We have a singularity! Wrist position lies on z0 axis! theta1 has infinite number of solutions!");
@@ -92,30 +70,26 @@ std::vector<std::vector<double>> kinverse::core::AnalyticalSolver::solveForPosit
   return positionalSolutions;
 }
 
-Eigen::Vector3d kinverse::core::AnalyticalSolver::getFirstJointZAxis() const {
-  return m_robot->getDHTable().front().getTransform().rotation().col(2);
-}
-
 std::vector<std::vector<double>> kinverse::core::AnalyticalSolver::solvePosition(double theta1, bool facingForward) const {
   double a, b, c;
   getTriangle(theta1, a, b, c);
 
-  const double cosine = (b * b + c * c - m_distanceFromSecondToThirdJoint * m_distanceFromSecondToThirdJoint -
-                         m_distanceFromThirdJointToWrist * m_distanceFromThirdJointToWrist) /
-                        (2.0 * m_distanceFromSecondToThirdJoint * m_distanceFromThirdJointToWrist);
+  const double cosine = (b * b + c * c - m_pImpl->getDistanceFromA3ToA2() * m_pImpl->getDistanceFromA3ToA2() -
+                         m_pImpl->getDistanceFromA3ToWrist() * m_pImpl->getDistanceFromA3ToWrist()) /
+                        (2.0 * m_pImpl->getDistanceFromA3ToA2() * m_pImpl->getDistanceFromA3ToWrist());
   const double sine = std::sqrt(1.0 - cosine * cosine);
   const double alpha = atan2(b, c);
 
   const auto solveForFacingForward = [&](double sine) -> std::vector<double> {
-    const double theta3 = atan2(sine, cosine) + m_gamma;
-    const double beta = atan2(m_distanceFromThirdJointToWrist * sine, m_distanceFromSecondToThirdJoint + m_distanceFromThirdJointToWrist * cosine);
+    const double theta3 = atan2(sine, cosine) + m_pImpl->getGamma();
+    const double beta = atan2(m_pImpl->getDistanceFromA3ToWrist() * sine, m_pImpl->getDistanceFromA3ToA2() + m_pImpl->getDistanceFromA3ToWrist() * cosine);
     const double theta2 = -(alpha + beta);
     return { theta1, theta2, theta3, 0.0, 0.0, 0.0 };
   };
 
   const auto solveForFacingBackward = [&](double sine) -> std::vector<double> {
-    const double theta3 = -atan2(sine, cosine) + m_gamma;
-    const double beta = atan2(m_distanceFromThirdJointToWrist * sine, m_distanceFromSecondToThirdJoint + m_distanceFromThirdJointToWrist * cosine);
+    const double theta3 = -atan2(sine, cosine) + m_pImpl->getGamma();
+    const double beta = atan2(m_pImpl->getDistanceFromA3ToWrist() * sine, m_pImpl->getDistanceFromA3ToA2() + m_pImpl->getDistanceFromA3ToWrist() * cosine);
     const double theta2 = (alpha + beta) - M_PI;
     return { theta1, theta2, theta3, 0.0, 0.0, 0.0 };
   };
@@ -145,7 +119,7 @@ std::vector<std::vector<double>> kinverse::core::AnalyticalSolver::solveForOrien
   double theta2 = configuration[1];
   double theta3 = configuration[2];
 
-  const Eigen::Matrix3d endEffectorOrientation = m_targetTransform.rotation();
+  const Eigen::Matrix3d endEffectorOrientation = m_flangeTransform.rotation();
   const Eigen::Matrix3d wristOrientation = computeWristOrientation(theta1, theta2, theta3);  // it is not wrist, it is the fourth joint
   const Eigen::Matrix3d fromWristToEndEffectorRotation = wristOrientation.transpose() * endEffectorOrientation;
 

@@ -32,7 +32,7 @@
 
 #include "stdafx.h"
 #include "test_forward_kinematics_solver.h"
-#include <kinverse/core/forward_kinematics_solver.h>
+#include <implementation/forward_kinematics_solver.h>
 #include <kinverse/core/robot.h>
 
 namespace kinverse {

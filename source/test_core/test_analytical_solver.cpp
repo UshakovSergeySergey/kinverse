@@ -39,6 +39,19 @@
 namespace kinverse {
   namespace core {
 
+    TEST_F(TestAnalyticalSolver, Solve_WhenEndEffectorTransformIsNotFinite_ThrowsException) {
+      // arrange
+      auto robot = factory::RobotFactory::create(RobotType::KukaKR5Arc);
+      auto ikSolver = std::make_shared<AnalyticalSolver>(robot);
+
+      const Eigen::Vector3d xyz{ std::numeric_limits<double>::quiet_NaN(), 0.0, 0.0 };
+      const Eigen::Vector3d abc{ std::numeric_limits<double>::infinity(), 0.0, 0.0 };
+      const Eigen::Affine3d endEffectorTransform = math::fromXYZABC(xyz, abc);
+
+      // act assert
+      EXPECT_THROW(ikSolver->solve(endEffectorTransform), std::domain_error);
+    }
+
     TEST_F(TestAnalyticalSolver, Solve_WhenShoulderSingularityDetected_ThrowsException) {
       // arrange
       auto robot = factory::RobotFactory::create(RobotType::KukaKR5Arc);
